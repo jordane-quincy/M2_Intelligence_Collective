@@ -59,17 +59,19 @@ end
 to prendre
   if not hold_box? ;;si la personne n'a pas encore de boite
   [
+    let link-created? false;
     if box-here != nobody  ;; s'il y a bien une boite sur la même case (patch)
     [
       ask box-here [
         if count (my-links) = 0 ;; pour compter les liens de la boite (cf ligne du dessus)
         [
-          ask myself ;;on se met sur la personne pour les actions suivantes
-          [
-            set hold_box? true ;;on vient de prendre une boite
-            create-link-with boite [ set tie-mode "fixed" ];;creation du lien entre l'individu et la boite + on met le lien en longeur fixe pour qu'il se deplace avec la boite
-          ]
+          create-link-with myself [ set tie-mode "fixed" ];;creation du lien entre l'individu (myself) et la boite + on met le lien en longeur fixe pour qu'il se deplace avec la boite
+          set link-created? true
         ]
+      ]
+
+      if link-created? [ ;;on vient de creer le lien donc
+        set hold_box? true ;;pour ne pas prendre plus d'une boite
       ]
     ]
   ]

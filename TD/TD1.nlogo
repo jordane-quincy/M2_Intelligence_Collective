@@ -46,6 +46,7 @@ to go  ;; forever button
   [
     deplacer
     prendre
+    deposer
   ]
   tick ;; augmenter le compteur
 end
@@ -74,6 +75,23 @@ to prendre
         set hold_box? true ;;pour ne pas prendre plus d'une boite
       ]
     ]
+  ]
+end
+
+to deposer
+  if hold_box? ;;si la personne a une boite
+  [
+    let colorOfHoldingBox "" ;;variable
+    ask box-here [
+      set colorOfHoldingBox color ;;on set la couleur de la boite qui est porte (box-here car le lien est en fixed donc l'individu et la boite sont toujours sur le même pitch)
+    ]
+
+    if count((box-on neighbors ) with [color = colorOfHoldingBox]) > 0 ;;si dans les voisins qui sont des boites et donc la couleur est la même que la boite
+    [
+      ask my-links [die] ;;on supprime le lien
+      set hold_box? false ;;boite deposee
+    ]
+
   ]
 end
 @#$#@#$#@

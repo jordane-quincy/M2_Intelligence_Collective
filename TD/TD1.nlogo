@@ -17,7 +17,7 @@ end
 to setup-box
   set-default-shape box "box"
   create-box nb_box [
-    set size 1.5 ;; plus lisible
+    set size 1 ;; plus lisible
     set color one-of [green red blue] ;; une de ces trois couleurs
     setxy random-xcor random-ycor
   ]
@@ -26,7 +26,7 @@ end
 to setup-person
   set-default-shape person "person"
   create-person nb_person [
-    set size 1.2 ;; plus lisible
+    set size 1 ;; plus lisible
     set color one-of [green red blue] ;; une de ces trois couleurs
     setxy random-xcor random-ycor
   ]
@@ -40,10 +40,24 @@ end
 to go  ;; forever button
   ask person ;; on selectionne les personnes
   [
-    rt random 360
-    fd random 3
+    deplacer
+    prendre
   ]
+  tick ;; augmenter le compteur
+end
 
+
+to deplacer
+  ifelse random 2 < 1 [rt random 46] [lt random 46] ;;on choisit de faire tourner a droite ou a gauche au hasard de 45 degré au max
+  fd random 3 ;;on avance
+end
+
+to prendre
+  let boite one-of box-here ;; on prend une boite parmis toute les boites
+  if boite != nobody ;; s'il y a bien une boite
+  [
+    ask boite [ die ] ;; fais disparaitre la boite
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -82,7 +96,7 @@ nb_person
 nb_person
 0
 100
-4
+34
 1
 1
 NIL
@@ -131,7 +145,7 @@ nb_box
 nb_box
 0
 100
-10
+41
 1
 1
 NIL

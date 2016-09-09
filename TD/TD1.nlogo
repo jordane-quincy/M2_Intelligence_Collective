@@ -1,3 +1,6 @@
+globals [
+  colorPatchValid
+]
 
 breed [box] ;;box
 breed [person] ;;personnes
@@ -11,17 +14,45 @@ person-own [hold_box?]
 
 to setup
   clear-all ;; nettoyage
+  setup-map
   setup-box
   setup-person
   reset-ticks ;; nettoyage
 end
 
+to-report isValidCoord [x y]
+  let isCorrect? false
+  let colorOfThePatch color
+  ask patch-at x y [
+    set isCorrect? colorPatchValid = colorOfThePatch ;; position valide si la couleur du patch a ces coordonnes est ok
+  ]
+  report isCorrect?
+end
+
+to setup-map
+  ;;export-world "map1.csv"
+  import-world "map1.csv"
+  set colorPatchValid white
+end
 
 to setup-box
   set-default-shape box "box"
   create-box nb_box [
     set size 1 ;; plus lisible
     set color one-of [green red blue] ;; une de ces trois couleurs
+    let xcoord random-xcor
+    let ycoord random-ycor
+    print xcoord
+    print ycoord
+    ;print isValidCoord xcoord ycoord
+    ;while [not isValidCoord xcoord ycoord] [
+      wait 2
+      set xcoord random-xcor
+      set ycoord random-ycor
+      print xcoord
+      print ycoord
+      ;print isValidCoord xcoord ycoord
+    ;]
     setxy random-xcor random-ycor ;;placement aleatoire
   ]
 end
@@ -86,7 +117,7 @@ to deposer
       set colorOfHoldingBox color ;;on set la couleur de la boite qui est porte (box-here car le lien est en fixed donc l'individu et la boite sont toujours sur le même pitch)
     ]
 
-    if count((box-on neighbors ) with [color = colorOfHoldingBox]) > 0 ;;si dans les voisins qui sont des boites et donc la couleur est la même que la boite
+    if any?((box-on neighbors ) with [color = colorOfHoldingBox]) ;;si dans les voisins qui sont des boites et donc la couleur est la même que la boite
     [
       ask my-links [die] ;;on supprime le lien
       set hold_box? false ;;boite deposee
@@ -98,11 +129,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-649
-470
-16
-16
-13.0
+455
+249
+10
+10
+10.0
 1
 10
 1
@@ -112,10 +143,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+-10
+10
+-10
+10
 0
 0
 1

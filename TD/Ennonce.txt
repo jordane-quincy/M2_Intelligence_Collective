@@ -1,0 +1,8 @@
+Exo 1 :
+
+Des individus et des boîtes
+I) Individus se déplacent aléatoirement
+
+II) Prendre une boîte et la déposer
+Mettre les boîtes à côté des boîtes de la même couleur
+Les individus peuvent aller sur la même case mais pas les boîtes

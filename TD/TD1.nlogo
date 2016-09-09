@@ -59,12 +59,18 @@ end
 to prendre
   if not hold_box? ;;si la personne n'a pas encore de boite
   [
-    let boite one-of box-here ;; on prend une boite parmis toute les boites
-    if boite != nobody  ;; s'il y a bien une boite sur la même case (patch)
+    if box-here != nobody  ;; s'il y a bien une boite sur la même case (patch)
     [
-      set hold_box? true ;;on vient de prendre une boite
-      create-link-with boite [ set tie-mode "fixed" ];;creation du lien entre l'individu et la boite + on met le lien en longeur fixe pour qu'il se deplace avec la boite
-
+      ask box-here [
+        if count (my-links) = 0 ;; pour compter les liens de la boite (cf ligne du dessus)
+        [
+          ask myself ;;on se met sur la personne pour les actions suivantes
+          [
+            set hold_box? true ;;on vient de prendre une boite
+            create-link-with boite [ set tie-mode "fixed" ];;creation du lien entre l'individu et la boite + on met le lien en longeur fixe pour qu'il se deplace avec la boite
+          ]
+        ]
+      ]
     ]
   ]
 end
@@ -105,7 +111,7 @@ nb_person
 nb_person
 0
 100
-34
+11
 1
 1
 NIL
@@ -154,7 +160,7 @@ nb_box
 nb_box
 0
 100
-41
+10
 1
 1
 NIL

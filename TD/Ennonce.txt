@@ -11,3 +11,6 @@ Individu : shape person
 Boîte : shape box
 
 Couleur : green / red / blue
+
+exo 2
+2 pièces, passer dans l'autre pièce pour poser une boîte

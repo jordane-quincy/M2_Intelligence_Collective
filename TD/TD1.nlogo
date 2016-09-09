@@ -21,11 +21,14 @@ to setup
 end
 
 to-report isValidCoord [x y]
+  print x
+  print y
   let isCorrect? false
-  let colorOfThePatch color
   ask patch-at x y [
-    set isCorrect? colorPatchValid = colorOfThePatch ;; position valide si la couleur du patch a ces coordonnes est ok
+    print pcolor
+    set isCorrect? pcolor  = colorPatchValid ;; position valide si la couleur du patch a ces coordonnes est ok
   ]
+  print isCorrect?
   report isCorrect?
 end
 
@@ -42,18 +45,13 @@ to setup-box
     set color one-of [green red blue] ;; une de ces trois couleurs
     let xcoord random-xcor
     let ycoord random-ycor
-    print xcoord
-    print ycoord
-    ;print isValidCoord xcoord ycoord
-    ;while [not isValidCoord xcoord ycoord] [
-      wait 2
+    while [not isValidCoord xcoord ycoord] [
       set xcoord random-xcor
       set ycoord random-ycor
-      print xcoord
-      print ycoord
       ;print isValidCoord xcoord ycoord
-    ;]
-    setxy random-xcor random-ycor ;;placement aleatoire
+    ]
+    print "ok"
+    setxy xcoord ycoord ;;placement aleatoire
   ]
 end
 
@@ -127,12 +125,12 @@ to deposer
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+211
 10
-455
-249
-10
-10
+456
+268
+11
+11
 10.0
 1
 10
@@ -143,10 +141,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--10
-10
--10
-10
+-11
+11
+-11
+11
 0
 0
 1

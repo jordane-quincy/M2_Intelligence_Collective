@@ -14,3 +14,8 @@ Couleur : green / red / blue
 
 Exo 2
 2 pièces, passer dans l'autre pièce pour poser une boîte
+Ces 2 grandes pièces dont reliées entre elles par un étroit passage,
+Tout autre emplacement n'est pas valide (pas de spawn au setup ni de déplacement autorisé)
+Chaque boîte à une destination valide choisi au hasard
+Utilisé l'algo A star (sur le net ou moodle) pour les déplacements
+Une fois ça fait, gère de plusieurs manière les conflits dans le passage etroit

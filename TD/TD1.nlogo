@@ -2,6 +2,9 @@
 breed [box] ;;box
 breed [person] ;;personnes
 
+
+person-own [hold_box?]
+
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Setup procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -19,7 +22,7 @@ to setup-box
   create-box nb_box [
     set size 1 ;; plus lisible
     set color one-of [green red blue] ;; une de ces trois couleurs
-    setxy random-xcor random-ycor
+    setxy random-xcor random-ycor ;;placement aleatoire
   ]
 end
 
@@ -28,7 +31,8 @@ to setup-person
   create-person nb_person [
     set size 1 ;; plus lisible
     set color one-of [green red blue] ;; une de ces trois couleurs
-    setxy random-xcor random-ycor
+    setxy random-xcor random-ycor ;;placement aleatoire
+    set hold_box? false ;;au depart pas de boite
   ]
 end
 
@@ -53,10 +57,15 @@ to deplacer
 end
 
 to prendre
-  let boite one-of box-here ;; on prend une boite parmis toute les boites
-  if boite != nobody ;; s'il y a bien une boite
+  if not hold_box? ;;si la personne n'a pas encore de boite
   [
-    ask boite [ die ] ;; fais disparaitre la boite
+    let boite one-of box-here ;; on prend une boite parmis toute les boites
+    if boite != nobody  ;; s'il y a bien une boite sur la même case (patch)
+    [
+      set hold_box? true ;;on vient de prendre une boite
+      create-link-with boite [ set tie-mode "fixed" ];;creation du lien entre l'individu et la boite + on met le lien en longeur fixe pour qu'il se deplace avec la boite
+
+    ]
   ]
 end
 @#$#@#$#@

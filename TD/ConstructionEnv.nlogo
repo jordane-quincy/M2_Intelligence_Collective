@@ -32,11 +32,10 @@ to setup-room
 end
 
 to setup-tunnel
-  ask patch 0 0 [ set pcolor colorPatchTunnel ]
-  ask patches-tunnel [ set pcolor colorPatchTunnel ]
+  ask patches-tunnel [ set pcolor colorPatchValid ]
 
   ; recoloration complete du tunnel
-  ask patches with [pcolor = colorPatchTunnel ] [ set pcolor colorPatchValid ]
+  ;ask patches with [pcolor = colorPatchTunnel ] [ set pcolor colorPatchValid ]
 end
 
 to-report patches-tunnel

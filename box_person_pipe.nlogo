@@ -347,6 +347,32 @@ to go  ;; forever button
   tick
 end
 
+to change-lights
+  if(ticks mod 50 = 0)
+  [
+    ask left-light-patches
+    [
+      ifelse pcolor = green
+      [
+        set pcolor red
+      ]
+      [
+        set pcolor green
+      ]
+    ]
+    ask right-light-patches
+    [
+      ifelse pcolor = green
+      [
+        set pcolor red
+      ]
+      [
+        set pcolor green
+      ]
+    ]
+  ]
+end
+
 to randomMove
   rt random 46
   lt random 46

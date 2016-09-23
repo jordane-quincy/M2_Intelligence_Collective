@@ -195,8 +195,8 @@ to-report find-a-path [ source-patch destination-patch ]
   set open []
   set closed []
 
-  print(source-patch)
-  print(destination-patch)
+  print word("source-patch : " source-patch)
+  print word("destination-patch : " destination-patch)
 
   ; add source path in the open list
   set open lput source-patch open
@@ -443,19 +443,38 @@ to let-box
          ask my-links [die]
          set color yellow
          set boxDropped true
-         while [[belongsToWorkspace?] of patch-here = false]
-         [
-           set target-x random-xcor
-           set target-y random-ycor
-           show "found"
+
+         ; set depart dans le workspace et si la place est libre
+         let start-x 0
+         let start-y 0
+         ask patch-here [
+           set start-x pxcor
+           set start-y pycor
          ]
-         fd 5
+         setxy start-x start-y
+         set source-x start-x
+         set source-y start-y
+         print (word "drop box at : " source-x " " source-y )
+
+
+         ; set destination dans le workspace et si la place est libre
+         let stop-x 0
+         let stop-y 0
+         ask one-of workspace-patches with [ any? box-here = false] [
+           set stop-x pxcor
+           set stop-y pycor
+         ]
+
+         set target-x stop-x
+         set target-y stop-y
+         print (word "next target-x : " target-x ", target-y : " target-y )
+
        ]
      ]
    ]
   if boxDropped[
     set hold_box false
-    print (word "boxDropped ! hold_box ?")
+    print (word "boxDropped ! hold_box ? " hold_box)
   ]
   ;ask my-out-links[die]
 end

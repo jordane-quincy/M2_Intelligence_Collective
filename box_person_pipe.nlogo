@@ -329,7 +329,7 @@ to-report accessDenied
   ask patch-ahead 1[
     set patchColor pcolor
   ]
-  report patchColor = 0
+  report patchColor = 0 or patchColor = red or patchColor = green
 end
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -551,7 +551,7 @@ nb_persons
 nb_persons
 1
 100
-1
+65
 1
 1
 NIL

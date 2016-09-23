@@ -23,6 +23,8 @@ patches-own[
 ]
 
 box-own[
+ source-x
+ source-y
  target-x
  target-y
 ]
@@ -109,6 +111,7 @@ to setup-boxes  ;;
       set color one-of [ blue red ]
       set size 2
 
+      ; set destination
       setxy random-xcor random-ycor
       while [[belongsToWorkspace?] of patch-here = false]
       [
@@ -117,11 +120,15 @@ to setup-boxes  ;;
         set target-y random-ycor
         ;show target-x show target-y
       ]
+      ; set position initiale
       setxy 0 0
       while [[belongsToWorkspace?] of patch-here = false]
       [
-        setxy random-xcor random-ycor
+        set source-x random-xcor
+        set source-y random-ycor
+        setxy source-x source-y
       ]
+      ;print (word "source-x : " source-x ", source-y : " source-y )
   ]
 end
 
@@ -334,7 +341,7 @@ pipe_position
 pipe_position
 0
 4
-0
+3
 1
 1
 NIL

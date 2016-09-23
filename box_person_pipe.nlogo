@@ -557,7 +557,7 @@ workspace_width
 workspace_width
 3
 8
-8
+4
 1
 1
 NIL

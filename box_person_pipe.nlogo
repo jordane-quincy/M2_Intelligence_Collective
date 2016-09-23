@@ -206,6 +206,7 @@ to take-box
 end
 
 to let-box
+  let boxDropped false
   if hold_box[
      let colorOfHoldedBox ""
      ask box-here[
@@ -217,7 +218,7 @@ to let-box
        if patch-here = patch-at target-x target-y
        [
          ask my-links [die]
-         set hold_box false
+         set boxDropped true
          while [[belongsToWorkspace?] of patch-here = false]
          [
            set target-x random-xcor
@@ -228,6 +229,10 @@ to let-box
        ]
      ]
    ]
+  if boxDropped[
+    set hold_box false
+    print (word "boxDropped ! hold_box ?")
+  ]
   ;ask my-out-links[die]
 end
 @#$#@#$#@
@@ -252,8 +257,8 @@ GRAPHICS-WINDOW
 70
 0
 50
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -301,7 +306,7 @@ nb_boxes
 nb_boxes
 0
 100
-5
+17
 1
 1
 NIL
@@ -316,7 +321,7 @@ nb_persons
 nb_persons
 0
 100
-2
+30
 1
 1
 NIL

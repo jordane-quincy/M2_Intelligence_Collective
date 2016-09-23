@@ -1,9 +1,12 @@
 globals[
- direction
- workspace-patches      ;;Patches où peuvent se déplacer les turtles.
- pipe-patches           ;;Passage d'un workspace à l'autre.
- world_width
- world_height
+  direction
+  workspace-patches      ;;Patches où peuvent se déplacer les turtles.
+  pipe-patches           ;;Passage d'un workspace à l'autre.
+  world_width
+  world_height
+  open ; the open list of patches
+  closed ; the closed list of patches
+  optimal-path ; the optimal path, list of patches from source to destination
 ]
 breed[box]
 breed[person]
@@ -17,9 +20,11 @@ person-own [
 patches-own[
   belongsToWorkspace? ; boolean that allow to determine if the patch selected belongs to the workspace
   belongsToPipe?      ; boolean that allow to determine if the patch selected belongs to the pipe
+  parent-patch        ; path's predecessor
   f                   ; the value of knowledge plus heuristic cost function f()
   g                   ; the value of knowledge cost function g()
   h                   ; the value of heuristic cost function h()
+  colorForAStar       ; color of the patch for a star (we don't want the patch colored in the environment)
 ]
 
 box-own[
@@ -109,7 +114,7 @@ to setup-boxes  ;;
 
   create-box nb_boxes[
       set color one-of [ blue red ]
-      set size 2
+      set size 1
 
       ; set destination
       setxy random-xcor random-ycor
@@ -137,7 +142,7 @@ end
 to setup-persons
   create-person nb_persons[
     set color violet
-    set size 3
+    set size 1
     while [[belongsToWorkspace?] of patch-here = false]
     [
       setxy random-xcor random-ycor
@@ -146,20 +151,187 @@ to setup-persons
   ]
 end
 
+to find-shortest-path-to-destination [xSource ySource xDest yDest]
+  print (word xDest yDest)
+  set path find-a-path (patch xSource ySource) (patch xDest yDest)
+  set optimal-path path
+  set current-path path
+  move xSource ySource xDest yDest
+end
+
+; the actual implementation of the A* path finding algorithm
+; it takes the source and destination patches as inputs
+; and reports the optimal path if one exists between them as output
+to-report find-a-path [ source-patch destination-patch ]
+
+  ; initialize all variables to default values
+  let search-done? false
+  let search-path []
+  let current-patch 0
+  set open []
+  set closed []
+
+  print(source-patch)
+  print(destination-patch)
+
+  ; add source path in the open list
+  set open lput source-patch open
+
+  ; loop until we reach the destination or the open list becomes empty
+  while [ search-done? != true ]
+  [
+    ifelse length open != 0
+    [
+      ; sort the parches in open list in increasing order of their f() values
+      set open sort-by [[f] of ?1 < [f] of ?2] open
+
+      ; take the first patch in the open list
+      ; as the current patch (which is currently being explored (n))
+      ; and remove it from the open list
+      set current-patch item 0 open
+      set open remove-item 0 open
+
+      ; add the current patch to the closed list
+      set closed lput current-patch closed
+
+      ask current-patch
+      [
+        ; if any of the neighbors is the destination stop the search process
+        ifelse any? neighbors4 with [ (pxcor = [ pxcor ] of destination-patch) and (pycor = [pycor] of destination-patch)]
+        [
+          set search-done? true
+        ]
+        [
+          ; the neighbors should not be obstacles or already explored patches (part of the closed list)
+          ask neighbors4 with [ pcolor != black and (not member? self closed) and (self != parent-patch) ]
+          [
+            ; the neighbors to be explored should also not be the source or
+            ; destination patches or already a part of the open list (unexplored patches list)
+            if not member? self open and self != source-patch and self != destination-patch
+            [
+              set colorForAStar 45
+
+              ; add the eligible patch to the open list
+              set open lput self open
+
+              ; update the path finding variables of the eligible patch
+              set parent-patch current-patch
+              set g [g] of parent-patch  + 1
+              set h distance destination-patch
+              set f (g + h)
+            ]
+          ]
+        ]
+        if self != source-patch
+        [
+          set colorForAStar 35
+        ]
+      ]
+    ]
+    [
+      ; if a path is not found (search is incomplete) and the open list is exhausted
+      ; display a user message and report an empty search path list.
+      user-message( "A path from the source to the destination does not exist." )
+      report []
+    ]
+  ]
+
+  ; if a path is found (search completed) add the current patch
+  ; (node adjacent to the destination) to the search path.
+  set search-path lput current-patch search-path
+
+   ; trace the search path from the current patch
+  ; all the way to the source patch using the parent patch
+  ; variable which was set during the search for every patch that was explored
+  let temp first search-path
+  while [ temp != source-patch ]
+  [
+    ask temp
+    [
+      set colorForAStar 85
+    ]
+    set search-path lput [parent-patch] of temp search-path
+    set temp [parent-patch] of temp
+  ]
+
+  ; add the destination patch to the front of the search path
+  set search-path fput destination-patch search-path
+
+  ; reverse the search path so that it starts from a patch adjacent to the
+  ; source patch and ends at the destination patch
+  set search-path reverse search-path
+
+  ; report the search path
+  report search-path
+end
+
+; make the turtle traverse (move through) the path all the way to the destination patch
+to move [xSource ySource xDest yDest]
+  while [length current-path != 0]
+  [
+    go-to-next-patch-in-current-path xSource ySource xDest yDest
+    wait 0.05
+  ]
+  if length current-path = 0
+  [
+    pu
+  ]
+end
+
+to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
+  face first current-path
+  fd 1
+  move-to first current-path
+  if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
+  [
+    ask patch-here
+    [
+      set colorForAStar black
+    ]
+  ]
+  set current-path remove-item 0 current-path
+end
+
+
+to-report accessDenied
+  let patchColor 9.9
+  ask patch-ahead 1[
+    set patchColor pcolor
+  ]
+  report patchColor = 0
+end
+
 ;;;;;;;;;;;;;;;;;;;;;
 ;;; Go procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go  ;; forever button
   ask person[
-       move
-       take-box
-       let-box
+    randomMove
+    take-box
+    if hold_box [
+      let xDest 0
+      let yDest 0
+      ask box-here [
+        set xDest target-x
+        set yDest target-y
+      ]
+      find-shortest-path-to-destination xcor ycor xDest yDest
     ]
+    let-box
+  ]
   tick
 end
 
-to move
+to randomMove
+  rt random 46
+  lt random 46
+  if (not can-move? 1) or (accessDenied) [ rt 180 ]
+  fd 1
+end
+
+
+to oldMove
   ;if[[isUsed?] of patch-here = false]
 
   ifelse not hold_box
@@ -192,7 +364,7 @@ end
 to take-box
   if not hold_box ;; Si la personne ne tient pas de boite
   [
-     if box-here != nobody ;; et si aucun boite n'est presente
+     if box-here != nobody ;; et si une boite est présente
      [
        ask box-here[
        if count (my-links) = 0 ;;and count ((box-on neighbors) with [color]) > 1
@@ -304,9 +476,9 @@ SLIDER
 91
 nb_boxes
 nb_boxes
-0
+1
 100
-17
+1
 1
 1
 NIL
@@ -319,9 +491,9 @@ SLIDER
 137
 nb_persons
 nb_persons
-0
+1
 100
-30
+1
 1
 1
 NIL

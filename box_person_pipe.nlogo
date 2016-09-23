@@ -337,6 +337,7 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go  ;; forever button
+  change-lights
   ask person[
     randomMove
     take-box

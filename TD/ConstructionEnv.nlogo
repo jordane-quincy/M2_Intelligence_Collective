@@ -64,7 +64,7 @@ end
 
 to-report patches-tunnel
   report patches with [
-    pycor = 0 and
+    pycor >= ( - tunnelSize / 2 ) and pycor <= tunnelSize / 2 and
     pxcor > (0 - max-pxcor / 4) and
     pxcor < max-pxcor / 4
     ]
@@ -117,6 +117,21 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+8
+155
+180
+188
+tunnelSize
+tunnelSize
+1
+4
+1
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

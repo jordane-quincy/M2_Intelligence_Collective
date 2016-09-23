@@ -1,8 +1,31 @@
+;;Jean-Baptiste DURIEZ
+;;Jordane QUINCY
+;;Maxime DEGRES
+
 breed [people]
 breed [boxes]
 
+globals
+[
+  open ; the open list of patches
+  closed ; the closed list of patches
+  optimal-path ; the optimal path, list of patches from source to destination
+]
+
+patches-own
+[
+  parent-patch ; path's predecessor
+  f ; the value of knowledge plus heuristic cost function f()
+  g ; the value of knowledge cost function g()
+  h ; the value of heuistic cost function h()
+  colorForAStar ; color of the patch for a star (we don't want the patch colored in the environment)
+]
+
+
 people-own [
  holdBox?
+ path ; the optimal path from source to destination
+ current-path ; part of the path that is left to be traversed
 ]
 
 to setup
@@ -17,7 +40,6 @@ to setupEnvironment
   ask patches[
     setup-room
   ]
-
 end
 
 to setup-room
@@ -35,7 +57,7 @@ end
 to setupPeople
   set-default-shape people "person"
   create-people 1 [
-   set size 2
+   set size 1
    set color red
    setxy -11 0
    set holdBox? false
@@ -45,9 +67,151 @@ end
 to setupBox
 end
 
+to find-shortest-path-to-destination [xSource ySource xDest yDest]
+  set path find-a-path one-of patches with [pxcor = xSource and pycor = ySource] one-of patches with [pxcor = xDest and pycor = yDest]
+  set optimal-path path
+  set current-path path
+  ;move
+end
+
+; the actual implementation of the A* path finding algorithm
+; it takes the source and destination patches as inputs
+; and reports the optimal path if one exists between them as output
+to-report find-a-path [ source-patch destination-patch ]
+
+  ; initialize all variables to default values
+  let search-done? false
+  let search-path []
+  let current-patch 0
+  set open []
+  set closed []
+
+
+  ; add source path in the open list
+  set open lput source-patch open
+
+  ; loop until we reach the destination or the open list becomes empty
+  while [ search-done? != true ]
+  [
+    ifelse length open != 0
+    [
+      ; sort the parches in open list in increasing order of their f() values
+      set open sort-by [[f] of ?1 < [f] of ?2] open
+
+      ; take the first patch in the open list
+      ; as the current patch (which is currently being explored (n))
+      ; and remove it from the open list
+      set current-patch item 0 open
+      set open remove-item 0 open
+
+      ; add the current patch to the closed list
+      set closed lput current-patch closed
+
+      ask current-patch
+      [
+        ; if any of the neighbors is the destination stop the search process
+        ifelse any? neighbors4 with [ (pxcor = [ pxcor ] of destination-patch) and (pycor = [pycor] of destination-patch)]
+        [
+          set search-done? true
+        ]
+        [
+          ; the neighbors should not be obstacles or already explored patches (part of the closed list)
+          ask neighbors4 with [ pcolor != black and (not member? self closed) and (self != parent-patch) ]
+          [
+            ; the neighbors to be explored should also not be the source or
+            ; destination patches or already a part of the open list (unexplored patches list)
+            if not member? self open and self != source-patch and self != destination-patch
+            [
+              set colorForAStar 45
+
+              ; add the eligible patch to the open list
+              set open lput self open
+
+              ; update the path finding variables of the eligible patch
+              set parent-patch current-patch
+              set g [g] of parent-patch  + 1
+              set h distance destination-patch
+              set f (g + h)
+            ]
+          ]
+        ]
+        if self != source-patch
+        [
+          set colorForAStar 35
+        ]
+      ]
+    ]
+    [
+      ; if a path is not found (search is incomplete) and the open list is exhausted
+      ; display a user message and report an empty search path list.
+      user-message( "A path from the source to the destination does not exist." )
+      report []
+    ]
+  ]
+
+  ; if a path is found (search completed) add the current patch
+  ; (node adjacent to the destination) to the search path.
+  set search-path lput current-patch search-path
+
+   ; trace the search path from the current patch
+  ; all the way to the source patch using the parent patch
+  ; variable which was set during the search for every patch that was explored
+  let temp first search-path
+  while [ temp != source-patch ]
+  [
+    ask temp
+    [
+      set colorForAStar 85
+    ]
+    set search-path lput [parent-patch] of temp search-path
+    set temp [parent-patch] of temp
+  ]
+
+  ; add the destination patch to the front of the search path
+  set search-path fput destination-patch search-path
+
+  ; reverse the search path so that it starts from a patch adjacent to the
+  ; source patch and ends at the destination patch
+  set search-path reverse search-path
+
+  ; report the search path
+  report search-path
+end
+
+; make the turtle traverse (move through) the path all the way to the destination patch
+to move [xSource ySource xDest yDest]
+  while [length current-path != 0]
+  [
+    go-to-next-patch-in-current-path xSource ySource xDest yDest
+    wait 0.05
+  ]
+  if length current-path = 0
+  [
+    pu
+  ]
+end
+
+to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
+  face first current-path
+  fd 1
+  move-to first current-path
+  if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
+  [
+    ask patch-here
+    [
+      set colorForAStar black
+    ]
+  ]
+  set current-path remove-item 0 current-path
+end
+
 to go
   ask people[
-    move
+    ;move
+    find-shortest-path-to-destination xcor ycor 14 4
+    move xcor ycor 14 4
+    find-shortest-path-to-destination xcor ycor -13 5
+    move xcor ycor -13 5
   ]
   tick
 end
@@ -60,22 +224,21 @@ to-report accessDenied
   report patchColor = 0
 end
 
-to move
-  rt random 46
-  lt random 46
-  if (not can-move? 1) or (accessDenied) [ rt 180 ]
-  fd 1
-end
-
+;to move
+ ; rt random 46
+  ;lt random 46
+  ;if (not can-move? 1) or (accessDenied) [ rt 180 ]
+  ;fd 1
+;end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
-10
-649
-470
+195
+12
+783
+621
 16
 16
-13.0
+17.52
 1
 10
 1
@@ -128,6 +291,13 @@ NIL
 NIL
 NIL
 1
+
+OUTPUT
+790
+220
+1030
+274
+12
 
 @#$#@#$#@
 ## WHAT IS IT?

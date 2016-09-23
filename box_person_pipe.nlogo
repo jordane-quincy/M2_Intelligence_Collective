@@ -1,7 +1,9 @@
-globals[
+﻿globals[
  direction
- workspace-patches      ;;Patches où peuvent se déplacer les turtles.
- pipe-patches           ;;Passage d'un workspace à l'autre.
+ workspace-patches      ;; Patches où peuvent se déplacer les turtles.
+ pipe-patches           ;; Passage d'un workspace à l'autre.
+ red-light-patches      ;; Couleurs des feux permettant le passage ou le blocage des personnes dans le pipe.
+ green-light-patches    ;;
  world_width
  world_height
 ]
@@ -51,12 +53,14 @@ to setup
 end
 
 to setup-patches
+  ;;GLOBAL PATCHES
   ask patches[
     set belongsToWorkspace? false
     set belongsToPipe? false
     ;set plabel "patch"
     ;show pxcor show pycor
   ]
+  ;;WORKSPACE PATCHES
   set workspace-patches patches with [
    (
     pxcor < max-pxcor / workspace_width and
@@ -78,34 +82,54 @@ to setup-patches
     set pcolor white
     ;set plabel "workspace"
   ]
-  ;ifelse workspace_height >= 5
-  ;[
-  ;  set pipe-patches patche<s with
-  ;  [
-  ;    pxcor > max-pxcor / workspace_width and
-  ;    pxcor < max-pxcor - (max-pxcor / workspace_width) and
-  ;    pycor > max-pycor / workspace_height * 2 and
-  ;    pycor < max-pycor - (max-pycor / workspace_height * 2)
-  ;  ]
-  ;]
-  ;[
-    set pipe-patches patches with
-    [
-      pxcor > max-pxcor / workspace_width and
-      pxcor < max-pxcor - (max-pxcor / workspace_width) and
-      pycor > max-pycor / 2 - max-pycor / 20 + pipe_position and
-      pycor < max-pycor / 2 + max-pycor / 20
-    ]
-  ;]
+
+  ;;PIPE PATCHES
+  let min-x (max-pxcor / workspace_width)
+  let max-x (max-pxcor - (max-pxcor / workspace_width))
+  let min-y (max-pycor / 2 - max-pycor / 20)
+  let max-y (max-pycor / 2 + max-pycor / 20)
+   set pipe-patches patches with
+   [
+      pxcor > min-x and
+      pxcor < max-x and
+      pycor > min-y and
+      pycor < max-y
+   ]
   ask pipe-patches[
     set belongsToWorkspace? false
     set belongsToPipe? true
     set pcolor white
     ;set plabel "pipe"
+
   ]
+  ;;LIGHT PATCHES
+
+  set red-light-patches patches with
+  [
+    pxcor > min-x and
+    pxcor < min-x + 1 and
+    pycor > min-y and
+    pycor < max-y
+  ]
+  ask red-light-patches
+  [
+    set pcolor red
+  ]
+  set green-light-patches patches with
+  [
+    pxcor > max-x - 1 and
+    pxcor < max-x and
+    pycor > min-y and
+    pycor < max-y
+  ]
+  ask green-light-patches
+  [
+    set pcolor green
+  ]
+
 end
 
-to setup-boxes  ;;
+to setup-boxes
 
   create-box nb_boxes[
       set color one-of [ blue red ]

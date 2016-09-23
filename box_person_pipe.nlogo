@@ -93,7 +93,7 @@ to setup-patches
     [
       pxcor > max-pxcor / workspace_width and
       pxcor < max-pxcor - (max-pxcor / workspace_width) and
-      pycor > max-pycor / 2 - max-pycor / 20 and
+      pycor > max-pycor / 2 - max-pycor / 20 + pipe_position and
       pycor < max-pycor / 2 + max-pycor / 20
     ]
   ;]
@@ -341,7 +341,7 @@ pipe_position
 pipe_position
 0
 4
-3
+4
 1
 1
 NIL

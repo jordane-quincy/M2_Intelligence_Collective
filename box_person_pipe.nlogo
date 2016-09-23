@@ -4,8 +4,8 @@ globals[
   pipe-patches           ;;Passage d'un workspace à l'autre.
   world_width
   world_height
-  red-light-patches      ;; Couleurs des feux permettant le passage ou le blocage des personnes dans le pipe.
-  green-light-patches    ;;
+  left-light-patches      ;; Couleurs des feux permettant le passage ou le blocage des personnes dans le pipe.
+  right-light-patches     ;;
   open ; the open list of patches
   closed ; the closed list of patches
   optimal-path ; the optimal path, list of patches from source to destination
@@ -109,25 +109,25 @@ to setup-patches
   ]
   ;;LIGHT PATCHES
 
-  set red-light-patches patches with
+  set left-light-patches patches with
   [
     pxcor > min-x and
     pxcor < min-x + 1 and
     pycor > min-y and
     pycor < max-y
   ]
-  ask red-light-patches
+  ask left-light-patches
   [
     set pcolor red
   ]
-  set green-light-patches patches with
+  set right-light-patches patches with
   [
     pxcor > max-x - 1 and
     pxcor < max-x and
     pycor > min-y and
     pycor < max-y
   ]
-  ask green-light-patches
+  ask right-light-patches
   [
     set pcolor green
   ]

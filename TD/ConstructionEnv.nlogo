@@ -24,11 +24,35 @@ to setup-patches
   ask patches
   [ setup-room
     setup-tunnel
-    recolor-patch ]
+    recolor-patch
+  ]
 end
 
 to setup-room
+  ask room-left [ set pcolor colorPatchRoom ]
+  ask room-right [ set pcolor colorPatchRoom ]
+end
 
+to-report room-left
+  ;print (max-pxcor / 3)
+  report patches with [
+    pycor >= (- max-pycor + max-pycor / 4) and
+    pycor <= (max-pycor - max-pycor / 4)
+    and
+    pxcor >= (- max-pxcor + max-pxcor / 4) and
+    pxcor <= (- max-pxcor / 4)
+    ]
+end
+
+to-report room-right
+  ;print (max-pxcor / 3)
+  report patches with [
+    pycor >= (- max-pycor + max-pycor / 4) and
+    pycor <= (max-pycor - max-pycor / 4)
+    and
+    pxcor >= max-pxcor / 4 and
+    pxcor <= (max-pxcor - max-pxcor / 4)
+    ]
 end
 
 to setup-tunnel
@@ -41,8 +65,9 @@ end
 to-report patches-tunnel
   report patches with [
     pycor = 0 and
-    pxcor >= (0 - max-pxcor / 3) and
-    pxcor <= max-pxcor / 3]
+    pxcor > (0 - max-pxcor / 4) and
+    pxcor < max-pxcor / 4
+    ]
 end
 
 to recolor-patch

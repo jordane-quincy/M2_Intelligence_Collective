@@ -140,31 +140,24 @@ to setup-boxes
       set color one-of [ blue red ]
       set size 1
 
-      ; set depart dans le workspace et si la place est libre
-      let start-x 0
-      let start-y 0
-      ask one-of workspace-patches with [ any? box-here = false] [
-        set start-x pxcor
-        set start-y pycor
+      ; set destination
+      setxy random-xcor random-ycor
+      while [[belongsToWorkspace?] of patch-here = false]
+      [
+        setxy random-xcor random-ycor
+        set target-x random-xcor
+        set target-y random-ycor
+        ;show target-x show target-y
       ]
-      setxy start-x start-y
-      set source-x start-x
-      set source-y start-y
-      print (word "source-x : " source-x ", source-y : " source-y )
-
-
-      ; set destination dans le workspace et si la place est libre
-      let stop-x 0
-      let stop-y 0
-      ask one-of workspace-patches with [ any? box-here = false] [
-        set stop-x pxcor
-        set stop-y pycor
+      ; set position initiale
+      setxy 0 0
+      while [[belongsToWorkspace?] of patch-here = false]
+      [
+        set source-x random-xcor
+        set source-y random-ycor
+        setxy source-x source-y
       ]
-
-      set target-x stop-x
-      set target-y stop-y
-      print (word "target-x : " target-x ", target-y : " target-y )
-
+      ;print (word "source-x : " source-x ", source-y : " source-y )
   ]
 end
 
@@ -425,7 +418,7 @@ to take-box
      if box-here != nobody ;; et si une boite est présente
      [
        ask box-here[
-       if count (my-links) = 0 ;;and count ((box-on neighbors) with [color]) > 1
+       if count (my-links) = 0 and (color = red or color = blue);;and count ((box-on neighbors) with [color]) > 1
        [
          create-link-with myself[set tie-mode "fixed"]
          ask myself[set hold_box true]
@@ -448,6 +441,7 @@ to let-box
        if patch-here = patch-at target-x target-y
        [
          ask my-links [die]
+         set color yellow
          set boxDropped true
          while [[belongsToWorkspace?] of patch-here = false]
          [
@@ -536,7 +530,7 @@ nb_boxes
 nb_boxes
 1
 100
-70
+1
 1
 1
 NIL
@@ -576,7 +570,7 @@ pipe_position
 pipe_position
 0
 4
-3
+4
 1
 1
 NIL

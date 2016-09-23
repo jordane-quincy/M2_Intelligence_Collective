@@ -140,24 +140,31 @@ to setup-boxes
       set color one-of [ blue red ]
       set size 1
 
-      ; set destination
-      setxy random-xcor random-ycor
-      while [[belongsToWorkspace?] of patch-here = false]
-      [
-        setxy random-xcor random-ycor
-        set target-x random-xcor
-        set target-y random-ycor
-        ;show target-x show target-y
+      ; set depart dans le workspace et si la place est libre
+      let start-x 0
+      let start-y 0
+      ask one-of workspace-patches with [ any? box-here = false] [
+        set start-x pxcor
+        set start-y pycor
       ]
-      ; set position initiale
-      setxy 0 0
-      while [[belongsToWorkspace?] of patch-here = false]
-      [
-        set source-x random-xcor
-        set source-y random-ycor
-        setxy source-x source-y
+      setxy start-x start-y
+      set source-x start-x
+      set source-y start-y
+      print (word "source-x : " source-x ", source-y : " source-y )
+
+
+      ; set destination dans le workspace et si la place est libre
+      let stop-x 0
+      let stop-y 0
+      ask one-of workspace-patches with [ any? box-here = false] [
+        set stop-x pxcor
+        set stop-y pycor
       ]
-      ;print (word "source-x : " source-x ", source-y : " source-y )
+
+      set target-x stop-x
+      set target-y stop-y
+      print (word "target-x : " target-x ", target-y : " target-y )
+
   ]
 end
 
@@ -528,7 +535,7 @@ nb_boxes
 nb_boxes
 1
 100
-1
+70
 1
 1
 NIL
@@ -568,7 +575,7 @@ pipe_position
 pipe_position
 0
 4
-4
+3
 1
 1
 NIL

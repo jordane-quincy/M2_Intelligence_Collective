@@ -109,7 +109,7 @@ to setup-boxes  ;;
 
   create-box nb_boxes[
       set color one-of [ blue red ]
-      set size 2
+      set size 1
 
       ; set destination
       setxy random-xcor random-ycor
@@ -137,7 +137,7 @@ end
 to setup-persons
   create-person nb_persons[
     set color violet
-    set size 3
+    set size 1
     while [[belongsToWorkspace?] of patch-here = false]
     [
       setxy random-xcor random-ycor

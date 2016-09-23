@@ -91,7 +91,7 @@ to setup-patches
   ;;PIPE PATCHES
   let min-x (max-pxcor / workspace_width)
   let max-x (max-pxcor - (max-pxcor / workspace_width))
-  let min-y (max-pycor / 2 - max-pycor / 20)
+  let min-y (max-pycor / 2 - max-pycor / 20 + pipe-position)
   let max-y (max-pycor / 2 + max-pycor / 20)
    set pipe-patches patches with
    [

@@ -1,4 +1,4 @@
-﻿globals[
+globals[
  direction
  workspace-patches      ;; Patches où peuvent se déplacer les turtles.
  pipe-patches           ;; Passage d'un workspace à l'autre.

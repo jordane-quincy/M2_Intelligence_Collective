@@ -479,8 +479,8 @@ GRAPHICS-WINDOW
 70
 0
 50
-1
-1
+0
+0
 1
 ticks
 30.0

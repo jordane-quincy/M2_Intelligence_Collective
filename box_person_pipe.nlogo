@@ -1,4 +1,4 @@
-globals[
+﻿globals[
  direction
  workspace-patches      ;; Patches où peuvent se déplacer les turtles.
  pipe-patches           ;; Passage d'un workspace à l'autre.
@@ -25,6 +25,8 @@ patches-own[
 ]
 
 box-own[
+ source-x
+ source-y
  target-x
  target-y
 ]
@@ -80,6 +82,7 @@ to setup-patches
     set pcolor white
     ;set plabel "workspace"
   ]
+
   ;;PIPE PATCHES
   let min-x (max-pxcor / workspace_width)
   let max-x (max-pxcor - (max-pxcor / workspace_width))
@@ -92,7 +95,6 @@ to setup-patches
       pycor > min-y and
       pycor < max-y
    ]
-  ;]
   ask pipe-patches[
     set belongsToWorkspace? false
     set belongsToPipe? true
@@ -133,6 +135,7 @@ to setup-boxes
       set color one-of [ blue red ]
       set size 2
 
+      ; set destination
       setxy random-xcor random-ycor
       while [[belongsToWorkspace?] of patch-here = false]
       [
@@ -141,11 +144,15 @@ to setup-boxes
         set target-y random-ycor
         ;show target-x show target-y
       ]
+      ; set position initiale
       setxy 0 0
       while [[belongsToWorkspace?] of patch-here = false]
       [
-        setxy random-xcor random-ycor
+        set source-x random-xcor
+        set source-y random-ycor
+        setxy source-x source-y
       ]
+      ;print (word "source-x : " source-x ", source-y : " source-y )
   ]
 end
 
@@ -223,6 +230,7 @@ to take-box
 end
 
 to let-box
+  let boxDropped false
   if hold_box[
      let colorOfHoldedBox ""
      ask box-here[
@@ -234,7 +242,7 @@ to let-box
        if patch-here = patch-at target-x target-y
        [
          ask my-links [die]
-         set hold_box false
+         set boxDropped true
          while [[belongsToWorkspace?] of patch-here = false]
          [
            set target-x random-xcor
@@ -245,6 +253,10 @@ to let-box
        ]
      ]
    ]
+  if boxDropped[
+    set hold_box false
+    print (word "boxDropped ! hold_box ?")
+  ]
   ;ask my-out-links[die]
 end
 @#$#@#$#@
@@ -269,8 +281,8 @@ GRAPHICS-WINDOW
 70
 0
 50
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -318,7 +330,7 @@ nb_boxes
 nb_boxes
 0
 100
-5
+17
 1
 1
 NIL
@@ -333,7 +345,7 @@ nb_persons
 nb_persons
 0
 100
-2
+30
 1
 1
 NIL
@@ -358,7 +370,7 @@ pipe_position
 pipe_position
 0
 4
-0
+4
 1
 1
 NIL

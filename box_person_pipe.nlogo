@@ -140,24 +140,31 @@ to setup-boxes
       set color one-of [ blue red ]
       set size 1
 
-      ; set destination
-      setxy random-xcor random-ycor
-      while [[belongsToWorkspace?] of patch-here = false]
-      [
-        setxy random-xcor random-ycor
-        set target-x random-xcor
-        set target-y random-ycor
-        ;show target-x show target-y
+      ; set depart dans le workspace et si la place est libre
+      let start-x 0
+      let start-y 0
+      ask one-of workspace-patches with [ any? box-here = false] [
+        set start-x pxcor
+        set start-y pycor
       ]
-      ; set position initiale
-      setxy 0 0
-      while [[belongsToWorkspace?] of patch-here = false]
-      [
-        set source-x random-xcor
-        set source-y random-ycor
-        setxy source-x source-y
-      ]
+      setxy start-x start-y
+      set source-x start-x
+      set source-y start-y
       ;print (word "source-x : " source-x ", source-y : " source-y )
+
+
+      ; set destination dans le workspace et si la place est libre
+      let stop-x 0
+      let stop-y 0
+      ask one-of workspace-patches with [ any? box-here = false] [
+        set stop-x pxcor
+        set stop-y pycor
+      ]
+
+      set target-x stop-x
+      set target-y stop-y
+      ;print (word "target-x : " target-x ", target-y : " target-y )
+
   ]
 end
 
@@ -176,7 +183,7 @@ to setup-persons
 end
 
 to find-shortest-path-to-destination [xSource ySource xDest yDest]
-  print (word xDest yDest)
+  print (word "xDest yDest : " xDest " " yDest)
   set path find-a-path (patch xSource ySource) (patch xDest yDest)
   set optimal-path path
   set current-path path
@@ -195,8 +202,8 @@ to-report find-a-path [ source-patch destination-patch ]
   set open []
   set closed []
 
-  print word("source-patch : " source-patch)
-  print word("destination-patch : " destination-patch)
+  print (word "source-patch : " source-patch)
+  print (word "destination-patch : " destination-patch)
 
   ; add source path in the open list
   set open lput source-patch open
@@ -322,7 +329,7 @@ to-report accessDenied
   ask patch-ahead 1[
     set patchColor pcolor
   ]
-  report patchColor = 0 or patchColor = red or patchColor = green
+  report patchColor = 0
 end
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -330,7 +337,6 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go  ;; forever button
-  change-lights
   ask person[
     randomMove
     take-box
@@ -340,6 +346,7 @@ to go  ;; forever button
       ask box-here [
         set xDest target-x
         set yDest target-y
+        print (word "hold_box & box-here")
       ]
       find-shortest-path-to-destination xcor ycor xDest yDest
     ]
@@ -418,10 +425,11 @@ to take-box
      if box-here != nobody ;; et si une boite est présente
      [
        ask box-here[
-       if count (my-links) = 0 and (color = red or color = blue);;and count ((box-on neighbors) with [color]) > 1
+       if count (my-links) = 0 ;;and count ((box-on neighbors) with [color]) > 1
        [
          create-link-with myself[set tie-mode "fixed"]
          ask myself[set hold_box true]
+         print (word "boite prise a amener en : " target-x ", " target-y )
         ]
        ]
      ]
@@ -430,6 +438,8 @@ end
 
 to let-box
   let boxDropped false
+  print (word "hold_box ? " hold_box )
+  show my-out-links
   if hold_box[
      let colorOfHoldedBox ""
      ask box-here[
@@ -441,7 +451,6 @@ to let-box
        if patch-here = patch-at target-x target-y
        [
          ask my-links [die]
-         set color yellow
          set boxDropped true
 
          ; set depart dans le workspace et si la place est libre
@@ -549,7 +558,7 @@ nb_boxes
 nb_boxes
 1
 100
-1
+70
 1
 1
 NIL
@@ -564,7 +573,7 @@ nb_persons
 nb_persons
 1
 100
-65
+1
 1
 1
 NIL
@@ -589,7 +598,7 @@ pipe_position
 pipe_position
 0
 4
-4
+1
 1
 1
 NIL

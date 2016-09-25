@@ -1,14 +1,16 @@
 globals[
   direction
-  workspace-patches      ;;Patches où peuvent se déplacer les turtles.
-  pipe-patches           ;;Passage d'un workspace à l'autre.
+  workspace-patches       ;; Patches où peuvent se déplacer les turtles.
+  pipe-patches            ;; Passage d'un workspace à l'autre.
   world_width
   world_height
   left-light-patches      ;; Couleurs des feux permettant le passage ou le blocage des personnes dans le pipe.
-  right-light-patches     ;;
+  right-light-patches     ;; Rouge ? on bloque et vert et bien on laisse passer...
+  current-ticks_lights    ;; Nombre de ticks indiquant quand un feu change de couleur
   open ; the open list of patches
   closed ; the closed list of patches
   optimal-path ; the optimal path, list of patches from source to destination
+  people-in-pipe          ;; Nombre de personnes dans le tunnel.
 ]
 breed[box]
 breed[person]
@@ -18,11 +20,12 @@ person-own [
   path ; the optimal path from source to destination
   current-path ; part of the path that is left to be traversed
   pathFinded
+  from?                   ;; [left, right] en fonction du patche franchi.
 ]
 
 patches-own[
-  belongsToWorkspace? ; boolean that allow to determine if the patch selected belongs to the workspace
-  belongsToPipe?      ; boolean that allow to determine if the patch selected belongs to the pipe
+  belongsToWorkspace?     ;; Boolean that allow to determine if the patch selected belongs to the workspace
+  belongsToPipe?          ;; Boolean that allow to determine if the patch selected belongs to the pipe
   parent-patch        ; path's predecessor
   f                   ; the value of knowledge plus heuristic cost function f()
   g                   ; the value of knowledge cost function g()
@@ -31,10 +34,11 @@ patches-own[
 ]
 
 box-own[
- source-x
- source-y
- target-x
- target-y
+  current-ticks           ;; Give the number of ticks at which the box become yellow.
+  source-x
+  source-y
+  target-x                ;; Target abscissa where the box need to be released after taken by a person.
+  target-y                ;; Target ordonate where the box need to be released after taken by a person.
 ]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -131,12 +135,14 @@ to setup-patches
   [
     set pcolor green
   ]
+  set current-ticks_lights 0
 
 end
 
 to setup-boxes
 
   create-box nb_boxes[
+    set current-ticks 0
       set color one-of [ blue red ]
       set size 1
 
@@ -346,6 +352,9 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go  ;; forever button
+
+  change-lights
+
   ask person[
     ifelse not hold_box [
       randomMove
@@ -379,11 +388,17 @@ to go  ;; forever button
 
     ]
   ]
+  ask box[
+    if(color = yellow and ticks - current-ticks >= 50)
+    [
+      set color one-of [red blue]
+    ]
+  ]
   tick
 end
 
 to change-lights
-  if(ticks mod 50 = 0)
+  if ticks - current-ticks_lights >= 50
   [
     ask left-light-patches
     [
@@ -405,6 +420,7 @@ to change-lights
         set pcolor green
       ]
     ]
+    set current-ticks_lights ticks
   ]
 end
 
@@ -413,26 +429,6 @@ to randomMove
   lt random 46
   if (not can-move? 1) or (accessDenied) [ rt 180 ]
   fd 1
-end
-
-
-to oldMove
-  ;if[[isUsed?] of patch-here = false]
-
-  ifelse not hold_box
-  [
-    rt random 50
-    lt random 50
-    fd 1 ;; Avancer de 1
-    ;; Si la personne ne tient pas une boite
-    if[belongsToWorkspace?] of patch-here = false ;; et si la personne vient de se déplacer hors de l'environnement de travail
-    [
-      fd -1 ;; Revenir en arriere
-    ]
-  ]
-  [
-    move_to
-  ]
 end
 
 to move_to
@@ -467,6 +463,7 @@ to let-box
   let boxDropped false
   if hold_box[
      ask box-here[
+       set current-ticks ticks
        ;show target-x show target-y
        if patch-here = patch target-x target-y
        [
@@ -531,8 +528,8 @@ GRAPHICS-WINDOW
 70
 0
 50
-0
-0
+1
+1
 1
 ticks
 30.0

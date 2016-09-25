@@ -421,26 +421,6 @@ to randomMove
   fd 1
 end
 
-
-to oldMove
-  ;if[[isUsed?] of patch-here = false]
-
-  ifelse not hold_box
-  [
-    rt random 50
-    lt random 50
-    fd 1 ;; Avancer de 1
-    ;; Si la personne ne tient pas une boite
-    if[belongsToWorkspace?] of patch-here = false ;; et si la personne vient de se déplacer hors de l'environnement de travail
-    [
-      fd -1 ;; Revenir en arriere
-    ]
-  ]
-  [
-    move_to
-  ]
-end
-
 to move_to
   rt random 50
     lt random 50

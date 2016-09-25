@@ -458,12 +458,21 @@ to take-box
 end
 
 to let-box
+  print "let box ?"
   let boxDropped false
+  let actualX xcor
+  let actualY ycor
   if hold_box[
-     ask box-here[
-       set current-ticks ticks
-       ;show target-x show target-y
-       if patch-here = patch target-x target-y
+    ;my-links.end1 is the box of the link with myself
+    ;we used "ask box-here" before but sometimes it is not working because the box is not in the patch
+    ;for example, we had patch (22,66) and box (22.31154245, 66.21545441545454), so box-here always returned nobody
+    ;So it is better to use the link that we made when we took the box
+    ask my-links [
+      ask end1 [
+        set current-ticks ticks
+       show ( patch-here = patch target-x target-y)
+       ;;check with xcor and ycor of the person (the box can not be on a integer number with the link and so the comparaison will be false
+       if patch-here = patch xcor ycor
        [
          print "On se prépare à lacher la boîte"
          ask my-links [die]
@@ -493,9 +502,9 @@ to let-box
          set target-x stop-x
          set target-y stop-y
          print (word "next target-x : " target-x ", target-y : " target-y )
-
        ]
-     ]
+      ]
+    ]
    ]
   if boxDropped[
     set pathFound false

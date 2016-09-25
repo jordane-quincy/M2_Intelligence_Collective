@@ -31,10 +31,11 @@ patches-own[
 ]
 
 box-own[
- source-x
- source-y
- target-x
- target-y
+  current-ticks           ; Donne le nombre de ticks auquel la boite passe au jaune
+  source-x
+  source-y
+  target-x
+  target-y
 ]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -137,6 +138,7 @@ end
 to setup-boxes
 
   create-box nb_boxes[
+    set current-ticks 0
       set color one-of [ blue red ]
       set size 1
 
@@ -377,6 +379,12 @@ to go  ;; forever button
 
     ]
   ]
+  ask box[
+    if(color = yellow and ticks - current-ticks >= 50)
+    [
+      set color one-of [red blue]
+    ]
+  ]
   tick
 end
 
@@ -465,6 +473,7 @@ to let-box
   let boxDropped false
   if hold_box[
      ask box-here[
+       set current-ticks ticks
        ;show target-x show target-y
        if patch-here = patch target-x target-y
        [
@@ -529,8 +538,8 @@ GRAPHICS-WINDOW
 70
 0
 50
-0
-0
+1
+1
 1
 ticks
 30.0

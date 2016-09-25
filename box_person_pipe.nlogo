@@ -1,14 +1,16 @@
 globals[
   direction
-  workspace-patches      ;;Patches où peuvent se déplacer les turtles.
-  pipe-patches           ;;Passage d'un workspace à l'autre.
+  workspace-patches       ;; Patches où peuvent se déplacer les turtles.
+  pipe-patches            ;; Passage d'un workspace à l'autre.
   world_width
   world_height
   left-light-patches      ;; Couleurs des feux permettant le passage ou le blocage des personnes dans le pipe.
-  right-light-patches     ;;
+  right-light-patches     ;; Rouge ? on bloque et vert et bien on laisse passer...
+  current-ticks_lights    ;; Nombre de ticks indiquant quand un feu change de couleur
   open ; the open list of patches
   closed ; the closed list of patches
   optimal-path ; the optimal path, list of patches from source to destination
+  people-in-pipe          ;; Nombre de personnes dans le tunnel.
 ]
 breed[box]
 breed[person]
@@ -18,11 +20,12 @@ person-own [
   path ; the optimal path from source to destination
   current-path ; part of the path that is left to be traversed
   pathFinded
+  from?                   ;; [left, right] en fonction du patche franchi.
 ]
 
 patches-own[
-  belongsToWorkspace? ; boolean that allow to determine if the patch selected belongs to the workspace
-  belongsToPipe?      ; boolean that allow to determine if the patch selected belongs to the pipe
+  belongsToWorkspace?     ;; Boolean that allow to determine if the patch selected belongs to the workspace
+  belongsToPipe?          ;; Boolean that allow to determine if the patch selected belongs to the pipe
   parent-patch        ; path's predecessor
   f                   ; the value of knowledge plus heuristic cost function f()
   g                   ; the value of knowledge cost function g()
@@ -31,11 +34,11 @@ patches-own[
 ]
 
 box-own[
-  current-ticks           ; Donne le nombre de ticks auquel la boite passe au jaune
+  current-ticks           ;; Give the number of ticks at which the box become yellow.
   source-x
   source-y
-  target-x
-  target-y
+  target-x                ;; Target abscissa where the box need to be released after taken by a person.
+  target-y                ;; Target ordonate where the box need to be released after taken by a person.
 ]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -132,6 +135,7 @@ to setup-patches
   [
     set pcolor green
   ]
+  set current-ticks_lights 0
 
 end
 
@@ -346,6 +350,9 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go  ;; forever button
+
+  change-lights
+
   ask person[
     ifelse not hold_box [
       randomMove
@@ -389,7 +396,7 @@ to go  ;; forever button
 end
 
 to change-lights
-  if(ticks mod 50 = 0)
+  if ticks - current-ticks_lights >= 50
   [
     ask left-light-patches
     [
@@ -411,6 +418,7 @@ to change-lights
         set pcolor green
       ]
     ]
+    set current-ticks_lights ticks
   ]
 end
 

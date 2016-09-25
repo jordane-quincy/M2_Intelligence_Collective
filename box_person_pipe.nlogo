@@ -39,6 +39,8 @@ box-own[
   source-y
   target-x                ;; Target abscissa where the box need to be released after taken by a person.
   target-y                ;; Target ordonate where the box need to be released after taken by a person.
+  oldTargetX
+  oldTargetY
 ]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -363,11 +365,23 @@ to go  ;; forever button
       let yDest 0
       let xSource 0
       let ySource 0
+      ;my-links.end1 is the box of the link with myself
+      ;we used "ask box-here" before but sometimes it is not working because the box is not in the patch
+      ;for example, we had patch (22,66) and box (22.31154245, 66.21545441545454), so box-here always returned nobody
+      ;So it is better to use the link that we made when we took the box
+      ;ask my-links [
+        ;ask end1 [
+          ;set xDest target-x
+          ;set yDest target-y
+         ; set xSource source-x
+        ;  set ySource source-y
+       ; ]
+      ;]
       ask box-here [
         set xDest target-x
-        set yDest target-y
-        set xSource source-x
-        set ySource source-y
+         set yDest target-y
+         set xSource source-x
+         set ySource source-y
       ]
       ;si on n'a pas encore trouvé le chemin on le cherche
       if not pathFound
@@ -458,7 +472,6 @@ to take-box
 end
 
 to let-box
-  print "let box ?"
   let boxDropped false
   let actualX xcor
   let actualY ycor
@@ -470,27 +483,22 @@ to let-box
     ask my-links [
       ask end1 [
         set current-ticks ticks
-       show ( patch-here = patch target-x target-y)
        ;;check with xcor and ycor of the person (the box can not be on a integer number with the link and so the comparaison will be false
        if patch-here = patch xcor ycor
        [
          print "On se prépare à lacher la boîte"
+         set oldTargetX target-x
+         set oldTargetY target-y
          ask my-links [die]
          set color yellow
          set boxDropped true
          ; set depart dans le workspace et si la place est libre
-         let start-x 0
-         let start-y 0
-         ask patch-here [
-           set start-x pxcor
-           set start-y pycor
-         ]
+         let start-x actualX
+         let start-y actualY
          setxy start-x start-y
          set source-x start-x
          set source-y start-y
          print (word "drop box at : " source-x " " source-y )
-
-
          ; set destination dans le workspace et si la place est libre
          let stop-x 0
          let stop-y 0

@@ -11,3 +11,5 @@ Pour le passage dans le tunnel, pour l'instant on pourrait faire simple en mode 
 Ou sinon mettre un temps avec les ticks comme à commencé à faire maxime puis à la fin du temps, on met rouge des 2 côtés et on attend qu'il n'y ait plus personne dans le tunnel pour remettre vert de l'autre côté
 Dans tout les cas il faudra modif le random move et le move du a star (en mode si rouge ne rien faire et le gars attendra devant)
 et faudra gérer que si on est dans le bon sens on peut passer le rouge (you know what i mean)
+
+La solution 2 me parait la plus cool :p surtout que max l'a déjà bien préparer faut juste ajouter quelques petits trucs

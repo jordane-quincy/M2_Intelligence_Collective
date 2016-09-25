@@ -17,6 +17,7 @@ person-own [
   hold_box
   path ; the optimal path from source to destination
   current-path ; part of the path that is left to be traversed
+  pathFinded
 ]
 
 patches-own[
@@ -172,6 +173,7 @@ end
 to setup-persons
   create-person nb_persons[
     set color violet
+    set pathFinded false
     set size 1
     while [[belongsToWorkspace?] of patch-here = false]
     [
@@ -186,7 +188,7 @@ to find-shortest-path-to-destination [xSource ySource xDest yDest]
   set path find-a-path (patch xSource ySource) (patch xDest yDest)
   set optimal-path path
   set current-path path
-  move xSource ySource xDest yDest
+  set pathFinded true
 end
 
 ; the actual implementation of the A* path finding algorithm
@@ -297,11 +299,7 @@ end
 
 ; make the turtle traverse (move through) the path all the way to the destination patch
 to move [xSource ySource xDest yDest]
-  while [length current-path != 0]
-  [
-    go-to-next-patch-in-current-path xSource ySource xDest yDest
-    wait 0.05
-  ]
+  go-to-next-patch-in-current-path xSource ySource xDest yDest
   if length current-path = 0
   [
     pu
@@ -337,18 +335,37 @@ end
 
 to go  ;; forever button
   ask person[
-    randomMove
-    take-box
-    if hold_box [
+    ifelse not hold_box [
+      randomMove
+      take-box
+    ]
+    [
       let xDest 0
       let yDest 0
+      let xSource 0
+      let ySource 0
       ask box-here [
         set xDest target-x
         set yDest target-y
+        set xSource source-x
+        set ySource source-y
       ]
-      find-shortest-path-to-destination xcor ycor xDest yDest
+      ;si on n'a pas encore trouvé le chemin on le cherche
+      if not pathFinded
+      [
+        find-shortest-path-to-destination xcor ycor xDest yDest
+      ]
+      ;si on a déjà trouvé le chemin on suit le chemin
+      if pathFinded
+      [
+        move xSource ySource xDest yDest
+      ]
+      if length current-path = 0
+      [
+        let-box
+      ]
+
     ]
-    let-box
   ]
   tick
 end
@@ -476,6 +493,7 @@ to let-box
      ]
    ]
   if boxDropped[
+    set pathFinded false
     set hold_box false
     print "boxDropped !"
   ]

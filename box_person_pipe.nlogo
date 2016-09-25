@@ -345,7 +345,6 @@ to go  ;; forever button
       ask box-here [
         set xDest target-x
         set yDest target-y
-        print (word "hold_box & box-here")
       ]
       find-shortest-path-to-destination xcor ycor xDest yDest
     ]
@@ -553,7 +552,7 @@ nb_boxes
 nb_boxes
 1
 100
-1
+2
 1
 1
 NIL
@@ -568,7 +567,7 @@ nb_persons
 nb_persons
 1
 100
-1
+8
 1
 1
 NIL

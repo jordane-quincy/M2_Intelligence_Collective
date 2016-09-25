@@ -388,8 +388,8 @@ to go  ;; forever button
 
     ]
   ]
-  ask box[
-    if(color = yellow and ticks - current-ticks >= 50)
+  ask box with[color = yellow][
+    if(ticks - current-ticks >= 50)
     [
       set color one-of [red blue]
     ]
@@ -469,8 +469,8 @@ to let-box
        [
          print "On se prépare à lacher la boîte"
          ask my-links [die]
+         set color yellow
          set boxDropped true
-
          ; set depart dans le workspace et si la place est libre
          let start-x 0
          let start-y 0

@@ -322,11 +322,21 @@ end
 
 
 to-report accessDenied
+  ;on ne peut pas se déplacer sur un patch de couleur noir
   let patchColor 9.9
+  let boxPresentsInPatchAhead false
   ask patch-ahead 1[
     set patchColor pcolor
+    if box-here = nobody [
+      set boxPresentsInPatchAhead true
+    ]
   ]
-  report patchColor = 0
+  let restrictedPatch false
+  ;Si on a une boite, on ne peut pas se déplacer sur la même case qu'une autre boîte
+  if hold_box and boxPresentsInPatchAhead[
+    set restrictedPatch true
+  ]
+  report patchColor = 0 or restrictedPatch
 end
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -460,8 +470,6 @@ to let-box
        [
          print "On se prépare à lacher la boîte"
          ask my-links [die]
-         set color yellow
-         print "color yellow"
          set boxDropped true
 
          ; set depart dans le workspace et si la place est libre
@@ -570,7 +578,7 @@ nb_boxes
 nb_boxes
 1
 100
-2
+86
 1
 1
 NIL
@@ -585,7 +593,7 @@ nb_persons
 nb_persons
 1
 100
-8
+1
 1
 1
 NIL

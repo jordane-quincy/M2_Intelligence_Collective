@@ -299,7 +299,9 @@ end
 
 ; make the turtle traverse (move through) the path all the way to the destination patch
 to move [xSource ySource xDest yDest]
-  go-to-next-patch-in-current-path xSource ySource xDest yDest
+  if length current-path != 0 [
+    go-to-next-patch-in-current-path xSource ySource xDest yDest
+  ]
   if length current-path = 0
   [
     pu
@@ -578,7 +580,7 @@ nb_boxes
 nb_boxes
 1
 100
-86
+29
 1
 1
 NIL

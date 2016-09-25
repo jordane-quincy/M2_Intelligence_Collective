@@ -44,7 +44,6 @@ to setup
   clear-all
   set-default-shape person "person"
   set-default-shape box "box"
-
   set world_width 70
   set world_height 50
 
@@ -425,7 +424,7 @@ to take-box
      if box-here != nobody ;; et si une boite est présente
      [
        ask box-here[
-       if count (my-links) = 0 ;;and count ((box-on neighbors) with [color]) > 1
+       if count (my-links) = 0 and (color = red or color = blue) ;;and count ((box-on neighbors) with [color]) > 1
        [
          create-link-with myself[set tie-mode "fixed"]
          ask myself[set hold_box true]
@@ -438,19 +437,15 @@ end
 
 to let-box
   let boxDropped false
-  print (word "hold_box ? " hold_box )
-  show my-out-links
   if hold_box[
-     let colorOfHoldedBox ""
-     ask box-here[
-       set colorOfHoldedBox color
-     ]
-     ;if count ((box-on neighbors) with [color = colorOfHoldedBox]) > 0
      ask box-here[
        ;show target-x show target-y
-       if patch-here = patch-at target-x target-y
+       if patch-here = patch target-x target-y
        [
+         print "On se prépare à lacher la boîte"
          ask my-links [die]
+         set color yellow
+         print "color yellow"
          set boxDropped true
 
          ; set depart dans le workspace et si la place est libre
@@ -483,7 +478,7 @@ to let-box
    ]
   if boxDropped[
     set hold_box false
-    print (word "boxDropped ! hold_box ? " hold_box)
+    print "boxDropped !"
   ]
   ;ask my-out-links[die]
 end
@@ -558,7 +553,7 @@ nb_boxes
 nb_boxes
 1
 100
-70
+1
 1
 1
 NIL

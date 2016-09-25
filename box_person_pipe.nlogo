@@ -19,7 +19,7 @@ person-own [
   hold_box
   path ; the optimal path from source to destination
   current-path ; part of the path that is left to be traversed
-  pathFinded
+  pathFound
   from?                   ;; [left, right] en fonction du patche franchi.
 ]
 
@@ -179,7 +179,7 @@ end
 to setup-persons
   create-person nb_persons[
     set color violet
-    set pathFinded false
+    set pathFound false
     set size 1
     while [[belongsToWorkspace?] of patch-here = false]
     [
@@ -194,7 +194,7 @@ to find-shortest-path-to-destination [xSource ySource xDest yDest]
   set path find-a-path (patch xSource ySource) (patch xDest yDest)
   set optimal-path path
   set current-path path
-  set pathFinded true
+  set pathFound true
 end
 
 ; the actual implementation of the A* path finding algorithm
@@ -352,9 +352,7 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go  ;; forever button
-
   change-lights
-
   ask person[
     ifelse not hold_box [
       randomMove
@@ -372,12 +370,12 @@ to go  ;; forever button
         set ySource source-y
       ]
       ;si on n'a pas encore trouvé le chemin on le cherche
-      if not pathFinded
+      if not pathFound
       [
         find-shortest-path-to-destination xcor ycor xDest yDest
       ]
       ;si on a déjà trouvé le chemin on suit le chemin
-      if pathFinded
+      if pathFound
       [
         move xSource ySource xDest yDest
       ]
@@ -500,7 +498,7 @@ to let-box
      ]
    ]
   if boxDropped[
-    set pathFinded false
+    set pathFound false
     set hold_box false
     print "boxDropped !"
   ]

@@ -11,6 +11,7 @@ globals[
   closed ; the closed list of patches
   optimal-path ; the optimal path, list of patches from source to destination
   people-in-pipe          ;; Nombre de personnes dans le tunnel.
+  lightsAreChanging       ;; True lorsque les 2 feux sont rouges et qu'on attend qu'il n'y ai plus personne dans le tunnel
 ]
 breed[box]
 breed[person]
@@ -21,6 +22,7 @@ person-own [
   current-path ; part of the path that is left to be traversed
   pathFound
   from?                   ;; [left, right] en fonction du patche franchi.
+  isInPipe ;If the person go through green patch, then he's in the tunnel
 ]
 
 patches-own[
@@ -53,6 +55,7 @@ to setup
   set-default-shape box "box"
   set world_width 70
   set world_height 50
+  set lightsAreChanging false
 
   resize-world 0 world_width 0 world_height
 
@@ -182,6 +185,7 @@ to setup-persons
   create-person nb_persons[
     set color violet
     set pathFound false
+    set isInPipe false
     set size 1
     while [[belongsToWorkspace?] of patch-here = false]
     [
@@ -331,6 +335,7 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
 end
 
 
+
 to-report accessDenied
   ;on ne peut pas se déplacer sur un patch de couleur noir
   let patchColor 9.9
@@ -346,7 +351,10 @@ to-report accessDenied
   if hold_box and boxPresentsInPatchAhead[
     set restrictedPatch true
   ]
-  report patchColor = 0 or restrictedPatch
+  ;On ne peut pas traverser le tunnel si la couleur du patch est rouge
+  ;Mais si la personne est dans le tunnel, elle peut alors passer sur un patch rouge
+  let colorPatchAheadIsRed patchColor = 15
+  report patchColor = 0 or restrictedPatch or (colorPatchAheadIsRed and not isInPipe)
 end
 
 ;;;;;;;;;;;;;;;;;;;;;
@@ -354,7 +362,6 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go  ;; forever button
-  change-lights
   ask person[
     ifelse not hold_box [
       randomMove
@@ -399,6 +406,12 @@ to go  ;; forever button
       ]
 
     ]
+    ;set if we're in pipe or not
+    let personInPipe false
+    ask patch-here [
+      set personInPipe belongsToPipe?
+    ]
+    set isInPipe personInPipe
   ]
   ask box with[color = yellow][
     if(ticks - current-ticks >= 50)
@@ -406,6 +419,7 @@ to go  ;; forever button
       set color one-of [red blue]
     ]
   ]
+  change-lights
   tick
 end
 
@@ -416,24 +430,46 @@ to change-lights
     [
       ifelse pcolor = green
       [
-        set pcolor red
+        if not lightsAreChanging [
+          set pcolor red
+        ]
       ]
       [
-        set pcolor green
+        let personInPipe false
+        ask person with [isInPipe] [
+          set personInPipe true
+        ]
+        set lightsAreChanging true
+        if not personInPipe [
+          set pcolor green
+          set current-ticks_lights ticks
+        ]
+
       ]
     ]
     ask right-light-patches
     [
       ifelse pcolor = green
       [
-        set pcolor red
+        if not lightsAreChanging [
+          set pcolor red
+        ]
       ]
       [
-        set pcolor green
+        let personInPipe false
+        ask person with [isInPipe] [
+          set personInPipe true
+        ]
+        set lightsAreChanging true
+        if not personInPipe [
+          set pcolor green
+          set current-ticks_lights ticks
+        ]
       ]
     ]
-    set current-ticks_lights ticks
+    if current-ticks_lights = ticks [set lightsAreChanging false]
   ]
+  show current-ticks_lights
 end
 
 to randomMove
@@ -592,7 +628,7 @@ nb_boxes
 nb_boxes
 1
 100
-29
+1
 1
 1
 NIL

@@ -14,4 +14,4 @@ et faudra gérer que si on est dans le bon sens on peut passer le rouge (you kno
 
 La solution 2 me parait la plus cool :p surtout que max l'a déjà bien préparer faut juste ajouter quelques petits trucs
 
-Bon du coup j'ai pris la solution 2, il me reste plus qu'à faire attendre le bonhomme qui a une boite (donc qui fait a star) si le patch est rouge vilà :)
+Bon du coup j'ai pris la solution 2, il me reste plus qu'à faire attendre le bonhomme qui a une boite (donc qui fait a star) si le patch est rouge voilà :)

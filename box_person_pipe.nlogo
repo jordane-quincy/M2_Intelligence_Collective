@@ -11,7 +11,8 @@ globals[
   closed ; the closed list of patches
   optimal-path ; the optimal path, list of patches from source to destination
   people-in-pipe          ;; Nombre de personnes dans le tunnel.
-  lightsAreChanging       ;; True lorsque les 2 feux sont rouges et qu'on attend qu'il n'y ai plus personne dans le tunnel
+  leftStayRed
+  rightStayRed
 ]
 breed[box]
 breed[person]
@@ -55,7 +56,8 @@ to setup
   set-default-shape box "box"
   set world_width 70
   set world_height 50
-  set lightsAreChanging false
+  set leftStayRed false
+  set rightStayRed false
 
   resize-world 0 world_width 0 world_height
 
@@ -322,16 +324,26 @@ end
 
 to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   face first current-path
-  fd 1
-  move-to first current-path
-  if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
-  [
-    ask patch-here
-    [
-      set colorForAStar black
+  let patchAheadIsRed false
+  let personInTunnel isInPipe
+  ask patch-ahead 1 [
+    if pcolor = 15 and not personInTunnel[
+      set patchAheadIsRed true
     ]
   ]
-  set current-path remove-item 0 current-path
+  if not patchAheadIsRed [
+    fd 1
+    move-to first current-path
+    if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
+    [
+      ask patch-here
+      [
+        set colorForAStar black
+      ]
+    ]
+    set current-path remove-item 0 current-path
+  ]
+
 end
 
 
@@ -424,52 +436,54 @@ to go  ;; forever button
 end
 
 to change-lights
-  if ticks - current-ticks_lights >= 50
+  ifelse ticks - current-ticks_lights >= 50
   [
     ask left-light-patches
     [
       ifelse pcolor = green
       [
-        if not lightsAreChanging [
-          set pcolor red
-        ]
+        set pcolor red
+        set leftStayRed true
+
       ]
       [
-        let personInPipe false
-        ask person with [isInPipe] [
-          set personInPipe true
+        if not leftStayRed [
+          let personInPipe false
+          ask person with [isInPipe] [
+            set personInPipe true
+          ]
+          if not personInPipe [
+            set pcolor green
+            set current-ticks_lights ticks
+          ]
         ]
-        set lightsAreChanging true
-        if not personInPipe [
-          set pcolor green
-          set current-ticks_lights ticks
-        ]
-
       ]
     ]
     ask right-light-patches
     [
       ifelse pcolor = green
       [
-        if not lightsAreChanging [
-          set pcolor red
-        ]
+        set pcolor red
+        set rightStayRed true
       ]
       [
-        let personInPipe false
-        ask person with [isInPipe] [
-          set personInPipe true
-        ]
-        set lightsAreChanging true
-        if not personInPipe [
-          set pcolor green
-          set current-ticks_lights ticks
+        if not rightStayRed [
+          let personInPipe false
+          ask person with [isInPipe] [
+            set personInPipe true
+          ]
+          if not personInPipe [
+            set pcolor green
+            set current-ticks_lights ticks
+          ]
         ]
       ]
     ]
-    if current-ticks_lights = ticks [set lightsAreChanging false]
   ]
-  show current-ticks_lights
+  [
+    set leftStayRed false
+    set rightStayRed false
+  ]
 end
 
 to randomMove

@@ -1,3 +1,9 @@
+;;Exo TD
+;;Maxime DEGRES
+;;Jean-Baptiste DURIEZ
+;;Jordane QUINCY
+
+
 globals[
   direction
   workspace-patches       ;; Patches où peuvent se déplacer les turtles.
@@ -366,6 +372,11 @@ to-report accessDenied
   ;On ne peut pas traverser le tunnel si la couleur du patch est rouge
   ;Mais si la personne est dans le tunnel, elle peut alors passer sur un patch rouge
   let colorPatchAheadIsRed patchColor = 15
+
+  ;;Une personne sans boite ne peut pas rentrer dans le tunnel
+  if not hold_box and (patchColor = 15 or patchColor = 55) [
+    set restrictedPatch true
+  ]
   report patchColor = 0 or restrictedPatch or (colorPatchAheadIsRed and not isInPipe)
 end
 
@@ -642,7 +653,7 @@ nb_boxes
 nb_boxes
 1
 100
-1
+23
 1
 1
 NIL
@@ -657,7 +668,7 @@ nb_persons
 nb_persons
 1
 100
-1
+29
 1
 1
 NIL

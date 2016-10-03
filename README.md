@@ -5,6 +5,9 @@ Best Cours EVER
 Need your phone Maxime ! Send me it on facebook pleeease :)
 OR MAIL :)
 
+Au cas où, ca fait deux jour mais pas de réponse je suppose donc que tu ne l'as pas vue.
+Je te l'ai envoyé sur FB ^^ 06-28-14-87-08, hésites pas à m'envoyer un message, tu sais pourquoi :)
+
 Il ne reste plus qu'à gérer le passage dans le tunnel et on n'a pas non plus gérer la collision des boites mais ça c'est chiant avec le A star....
 
 Pour le passage dans le tunnel, pour l'instant on pourrait faire simple en mode dès que un gars rentre dans le tunnel, on le bloc puis quand il sort on met vert de l'autre côté

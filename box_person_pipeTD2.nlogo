@@ -434,7 +434,7 @@ to go  ;; forever button
        ; ]
       ;]
       ask box-here [
-        set xDest target-x
+         set xDest target-x
          set yDest target-y
          set xSource source-x
          set ySource source-y

@@ -333,20 +333,32 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   let patchAheadIsRed false
   let somethingIsAhead false
   let personInTunnel isInPipe
+  let num_box -1
+
+  ask my-links [
+          ask end1 [
+            set num_box who
+            ;print(word "patch box: " patch-here)
+          ]
+  ]
 
   ask patch-ahead 1 [
     if pcolor = 15 and not personInTunnel[
       set patchAheadIsRed true
     ]
-    ifelse any? person-here = false and any? box-here = false
+    ifelse any? person-here = false and (any? box-here with [who != num_box]) = false
       [
-        print (word "nobody here" pxcor)
+        ;print (word "nobody here" pxcor)
         set somethingIsAhead false
       ]
       [
-        print (word "something here" pxcor)
+        ;print (word "something here" pxcor)
         set somethingIsAhead true
+
         ask person-here [
+          let patch-person patch-here
+          ;print(word "patch person: " patch-here)
+
           randomMove
         ]
       ]

@@ -355,18 +355,28 @@ end
 
 
 to-report accessDenied
+  if (not can-move? 1) [report true] ; si le patch devant est en dehors de l'environnement, exit direct
   ;on ne peut pas se déplacer sur un patch de couleur noir
   let patchColor 9.9
   let boxPresentsInPatchAhead false
+  let personPresentsInPatchAhead false
   ask patch-ahead 1[
     set patchColor pcolor
-    if box-here = nobody [
+    if any? box-here [
+      show "box devant"
       set boxPresentsInPatchAhead true
+    ]
+    if any? person-here [
+      show "personne devant"
+      set personPresentsInPatchAhead true
     ]
   ]
   let restrictedPatch false
   ;Si on a une boite, on ne peut pas se déplacer sur la même case qu'une autre boîte
   if hold_box and boxPresentsInPatchAhead[
+    set restrictedPatch true
+  ]
+  if personPresentsInPatchAhead[
     set restrictedPatch true
   ]
   ;On ne peut pas traverser le tunnel si la couleur du patch est rouge
@@ -500,7 +510,9 @@ end
 to randomMove
   rt random 46
   lt random 46
-  if (not can-move? 1) or (accessDenied) [ rt 180 ]
+  if accessDenied [
+    rt 180
+    ]
   fd 1
 end
 
@@ -653,7 +665,7 @@ nb_boxes
 nb_boxes
 1
 100
-23
+1
 1
 1
 NIL
@@ -668,7 +680,7 @@ nb_persons
 nb_persons
 1
 100
-29
+1
 1
 1
 NIL

@@ -331,13 +331,24 @@ end
 to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   face first current-path
   let patchAheadIsRed false
+  let somethingIsAhead false
   let personInTunnel isInPipe
+
   ask patch-ahead 1 [
     if pcolor = 15 and not personInTunnel[
       set patchAheadIsRed true
     ]
+    ifelse any? person-here = false and any? box-here = false
+      [
+        print (word "nobody here" pxcor)
+        set somethingIsAhead false
+      ]
+      [
+        print (word "something here" pxcor)
+        set somethingIsAhead true
+      ]
   ]
-  if not patchAheadIsRed [
+  if not patchAheadIsRed and not somethingIsAhead[
     fd 1
     move-to first current-path
     if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
@@ -352,7 +363,11 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
 
 end
 
+askPersonAheadToMove
 
+
+
+end
 
 to-report accessDenied
   if (not can-move? 1) [report true] ; si le patch devant est en dehors de l'environnement, exit direct
@@ -706,7 +721,7 @@ pipe_width
 pipe_width
 0
 4
-1
+4
 1
 1
 NIL

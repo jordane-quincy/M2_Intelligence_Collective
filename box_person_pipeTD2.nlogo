@@ -360,13 +360,14 @@ to-report accessDenied
   let patchColor 9.9
   let boxPresentsInPatchAhead false
   let personPresentsInPatchAhead false
+  let numTurtle who
   ask patch-ahead 1[
     set patchColor pcolor
     if any? box-here [
       show "box devant"
       set boxPresentsInPatchAhead true
     ]
-    if any? person-here [
+    if any? person-here with [who != numTurtle] [
       show "personne devant"
       set personPresentsInPatchAhead true
     ]
@@ -680,7 +681,7 @@ nb_persons
 nb_persons
 1
 100
-1
+2
 1
 1
 NIL

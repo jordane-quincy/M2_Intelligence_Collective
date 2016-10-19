@@ -406,6 +406,45 @@ to-report accessDenied
   report patchColor = 0 or restrictedPatch or (colorPatchAheadIsRed and not isInPipe)
 end
 
+
+to-report accessDeniedForPatch [ patchToCheck ]
+  if patchToCheck = nobody [report true] ; si le patch devant est en dehors de l'environnement, exit direct
+
+  ;on ne peut pas se déplacer sur un patch de couleur noir
+  let patchColor 9.9
+  let boxPresentsInPatchAhead false
+  let personPresentsInPatchAhead false
+  let numTurtle who
+  ask patchToCheck [
+    set patchColor pcolor
+    if any? box-here [
+      show "box devant"
+      set boxPresentsInPatchAhead true
+    ]
+    if any? person-here with [who != numTurtle] [
+      show "personne devant"
+      set personPresentsInPatchAhead true
+    ]
+  ]
+  let restrictedPatch false
+  ;Si on a une boite, on ne peut pas se déplacer sur la même case qu'une autre boîte
+  if hold_box and boxPresentsInPatchAhead[
+    set restrictedPatch true
+  ]
+  if personPresentsInPatchAhead[
+    set restrictedPatch true
+  ]
+  ;On ne peut pas traverser le tunnel si la couleur du patch est rouge
+  ;Mais si la personne est dans le tunnel, elle peut alors passer sur un patch rouge
+  let colorPatchAheadIsRed patchColor = 15
+
+  ;;Une personne sans boite ne peut pas rentrer dans le tunnel
+  if not hold_box and (patchColor = 15 or patchColor = 55) [
+    set restrictedPatch true
+  ]
+  report patchColor = 0 or restrictedPatch or (colorPatchAheadIsRed and not isInPipe)
+end
+
 ;;;;;;;;;;;;;;;;;;;;;
 ;;; Go procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;
@@ -530,10 +569,30 @@ end
 to randomMove
   rt random 46
   lt random 46
-  if accessDenied [
+  let isMoveAheadPossible false
+  ifelse accessDeniedForPatch patch-ahead 1 [
+    print (word "accessDeniedForPatch ahead 1")
     rt 180
-    ]
-  fd 1
+    ;si apres s'etre retourne, le turtle se retrouve dans l'impossibilite d'avancer (obstacle ou en dehors de l'environnement)
+    if accessDeniedForPatch patch-ahead 1 [
+      print (word "accessDeniedForPatch ahead 2")
+      ;on cherche dans les patches voisins s'il y a une possibilite de fuite
+      foreach sort neighbors [
+        if not accessDeniedForPatch ? [ ;si l'acces n'est pas interdit pour le voisin courant
+          print (word "escape possible to patch " pxcor " " pycor)
+          facexy pxcor pycor
+          set isMoveAheadPossible true
+        ]
+      ]
+     ]
+  ]
+  [
+    set isMoveAheadPossible true
+  ]
+
+  if isMoveAheadPossible [
+    fd 1
+  ]
 end
 
 to move_to
@@ -700,7 +759,7 @@ nb_persons
 nb_persons
 1
 100
-29
+23
 1
 1
 NIL

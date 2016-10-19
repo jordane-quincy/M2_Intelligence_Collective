@@ -331,13 +331,27 @@ end
 to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   face first current-path
   let patchAheadIsRed false
+  let somethingIsAhead false
   let personInTunnel isInPipe
+
   ask patch-ahead 1 [
     if pcolor = 15 and not personInTunnel[
       set patchAheadIsRed true
     ]
+    ifelse any? person-here = false and any? box-here = false
+      [
+        print (word "nobody here" pxcor)
+        set somethingIsAhead false
+      ]
+      [
+        print (word "something here" pxcor)
+        set somethingIsAhead true
+        ask person-here [
+          randomMove
+        ]
+      ]
   ]
-  if not patchAheadIsRed [
+  if not patchAheadIsRed and not somethingIsAhead[
     fd 1
     move-to first current-path
     if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
@@ -352,32 +366,22 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
 
 end
 
-
+;to-report askPersonAheadToMove [person]
+;end
 
 to-report accessDenied
-  if (not can-move? 1) [report true] ; si le patch devant est en dehors de l'environnement, exit direct
   ;on ne peut pas se déplacer sur un patch de couleur noir
   let patchColor 9.9
   let boxPresentsInPatchAhead false
-  let personPresentsInPatchAhead false
-  let numTurtle who
   ask patch-ahead 1[
     set patchColor pcolor
-    if any? box-here [
-      show "box devant"
+    if box-here = nobody [
       set boxPresentsInPatchAhead true
-    ]
-    if any? person-here with [who != numTurtle] [
-      show "personne devant"
-      set personPresentsInPatchAhead true
     ]
   ]
   let restrictedPatch false
   ;Si on a une boite, on ne peut pas se déplacer sur la même case qu'une autre boîte
   if hold_box and boxPresentsInPatchAhead[
-    set restrictedPatch true
-  ]
-  if personPresentsInPatchAhead[
     set restrictedPatch true
   ]
   ;On ne peut pas traverser le tunnel si la couleur du patch est rouge
@@ -511,9 +515,7 @@ end
 to randomMove
   rt random 46
   lt random 46
-  if accessDenied [
-    rt 180
-    ]
+  if (not can-move? 1) or (accessDenied) [ rt 180 ]
   fd 1
 end
 
@@ -666,7 +668,7 @@ nb_boxes
 nb_boxes
 1
 100
-1
+23
 1
 1
 NIL
@@ -681,7 +683,7 @@ nb_persons
 nb_persons
 1
 100
-2
+29
 1
 1
 NIL
@@ -706,7 +708,7 @@ pipe_width
 pipe_width
 0
 4
-1
+4
 1
 1
 NIL

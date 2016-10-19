@@ -222,7 +222,7 @@ to-report find-a-path [ source-patch destination-patch ]
   let current-patch 0
   set open []
   set closed []
-
+  print (word "x : " xcor ", y: " ycor)
   print (word "source-patch : " source-patch)
   print (word "destination-patch : " destination-patch)
 
@@ -433,11 +433,15 @@ to go  ;; forever button
         ;  set ySource source-y
        ; ]
       ;]
-      ask box-here [
-         set xDest target-x
+
+      ;On recupere la boite via le link et no  box-here
+      ask my-links [
+        ask end1 [
+          set xDest target-x
          set yDest target-y
          set xSource source-x
          set ySource source-y
+        ]
       ]
       ;si on n'a pas encore trouvé le chemin on le cherche
       if not pathFound
@@ -612,9 +616,9 @@ to let-box
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+216
 10
-930
+936
 551
 -1
 -1
@@ -632,8 +636,8 @@ GRAPHICS-WINDOW
 70
 0
 50
-1
-1
+0
+0
 1
 ticks
 30.0

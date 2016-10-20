@@ -331,9 +331,11 @@ end
 to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   face first current-path
   let patchAheadIsRed false
-  let somethingIsAhead false
+  let anyoneAhead? false
+  let boxAhead? false
   let personInTunnel isInPipe
   let num_box -1
+  let personAhead person-here
 
   ask my-links [
           ask end1 [
@@ -342,44 +344,68 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
           ]
   ]
 
-  ask patch-ahead 1 [
+  ask patch-ahead 1
+  [
     if pcolor = 15 and not personInTunnel[
       set patchAheadIsRed true
     ]
-    ifelse any? person-here = false and (any? box-here with [who != num_box]) = false
-      [
-        ;print (word "nobody here" pxcor)
-        set somethingIsAhead false
-      ]
-      [
-        ;print (word "something here" pxcor)
-        set somethingIsAhead true
+    ifelse any? person-here = false
+    [
+      set anyoneAhead? false
+    ]
+    [
+      set anyoneAhead? true
+      set personAhead person-here
+    ]
+    if (any? box-here with [who != num_box]) = true; and not any? person-here
+    [
+      set boxAhead? true
+    ]
+  ]
 
-        ask person-here [
-          let patch-person patch-here
-          ;print(word "patch person: " patch-here)
+  ask patch-ahead 2
+  [
+     if any? person-here
+     [
+       set anyoneAhead? true
+       set boxAhead? false
+       set personAhead person-here
+     ]
+  ]
 
-          randomMove
+  if not patchAheadIsRed
+  [
+    ifelse not boxAhead? and not anyoneAhead?
+    [
+      fd 1
+      move-to first current-path
+      if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
+      [
+        ask patch-here
+        [
+          set colorForAStar black
         ]
       ]
-  ]
-  if not patchAheadIsRed and not somethingIsAhead[
-    fd 1
-    move-to first current-path
-    if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
+      set current-path remove-item 0 current-path
+    ]
     [
-      ask patch-here
-      [
-        set colorForAStar black
+      ifelse boxAhead?;;;;;;;;;;;;;;;Si boite ahead;;;;;;;;;;;;;;;;;
+      [print(word "boxahead true")
+        ;randomMove
+        ;find-shortest-path-to-destination xcor ycor newX newY
+      ]
+      [print(word "personahead true")
+        ask patch-ahead 1
+        [
+          ask personAhead
+          [
+            randomMove
+          ]
+        ]
       ]
     ]
-    set current-path remove-item 0 current-path
   ]
-
 end
-
-;to-report askPersonAheadToMove [person]
-;end
 
 to-report accessDenied
   if (not can-move? 1) [report true] ; si le patch devant est en dehors de l'environnement, exit direct
@@ -582,7 +608,7 @@ to randomMove
   rt random 46
   lt random 46
   let isMoveAheadPossible false
-  ifelse accessDeniedForPatch patch-ahead 1 [
+  ifelse accessDeniedForPatch (patch-ahead 1) [
     print (word "accessDeniedForPatch ahead 1")
     rt 180
     ;si apres s'etre retourne, le turtle se retrouve dans l'impossibilite d'avancer (obstacle ou en dehors de l'environnement)
@@ -707,8 +733,8 @@ GRAPHICS-WINDOW
 70
 0
 50
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -756,7 +782,7 @@ nb_boxes
 nb_boxes
 1
 100
-23
+37
 1
 1
 NIL
@@ -771,7 +797,7 @@ nb_persons
 nb_persons
 1
 100
-23
+16
 1
 1
 NIL

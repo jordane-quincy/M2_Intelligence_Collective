@@ -35,6 +35,7 @@ person-own [
 patches-own[
   deplacement_x             ;;Soustraction entre la nouvelle position x et l'ancienne.
   deplacement_y             ;;Soustraction entre la nouvelle position y et l'ancienne.
+  nb_zero_move              ;;Determine le nombre de fois ou la personne n'a pas bougée.
   belongsToWorkspace?     ;; Boolean that allow to determine if the patch selected belongs to the workspace
   belongsToPipe?          ;; Boolean that allow to determine if the patch selected belongs to the pipe
   parent-patch        ; path's predecessor
@@ -197,6 +198,7 @@ to setup-persons
     set pathFound false
     set isInPipe false
     set size 1
+    set nb_zero_move 0
     while [[belongsToWorkspace?] of patch-here = false]
     [
       setxy random-xcor random-ycor
@@ -227,6 +229,7 @@ to-report find-a-path [ source-patch destination-patch ]
   print (word "x : " xcor ", y: " ycor)
   print (word "source-patch : " source-patch)
   print (word "destination-patch : " destination-patch)
+  let obstacle true
 
   ; add source path in the open list
   set open lput source-patch open
@@ -256,8 +259,15 @@ to-report find-a-path [ source-patch destination-patch ]
           set search-done? true
         ]
         [
+          ;if any? box-here = true[
+          ;  ask box-here[
+          ;    ask my-links [
+          ;      set obstacle false
+          ;    ]
+          ;  ]
+          ;]
           ; the neighbors should not be obstacles or already explored patches (part of the closed list)
-          ask neighbors4 with [ pcolor != black and (not member? self closed) and (self != parent-patch) ]
+          ask neighbors4 with [ pcolor != black and (not member? self closed) and (self != parent-patch)]; and obstacle = false]
           [
             ; the neighbors to be explored should also not be the source or
             ; destination patches or already a part of the open list (unexplored patches list)
@@ -338,11 +348,15 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   let personInTunnel isInPipe
   let num_box -1
   let personAhead person-here
+  let boxAhead 0
+  let destX 0
+  let destY 0
 
   ask my-links [
           ask end1 [
             set num_box who
-            ;print(word "patch box: " patch-here)
+            set destX target-x
+            set destY target-y
           ]
   ]
 
@@ -364,6 +378,7 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
       set boxAhead? true
       ;Permet de voir si la boite rencontré possede une personne
       ask box-here[
+        set boxAhead myself
        ask my-links [
          set anyoneAhead? true
          set personAhead end2
@@ -373,23 +388,16 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
     ]
   ]
 
-  ;Permet de voir si la boite
-  ;ask patch-ahead 2
-  ;[
-     ;if any? person-here
-     ;[
-       ;set anyoneAhead? true
-       ;set personAhead person-here
-     ;]
-  ;]
 
   if not patchAheadIsRed
   [
-    ifelse not boxAhead? and not anyoneAhead?
-    [
-      let old_position pxcor
+    ;set deplacement_x 0
+    ifelse not anyoneAhead? and not boxAhead?
+    [print(word "Pas de box pas de person")
+      let old_position xcor
       fd 1
-      set deplacement_x (pxcor - old_position)
+      set deplacement_x (xcor - old_position)
+      print(word "DEPLACEMENT: " deplacement_x)
       move-to first current-path
       if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
       [
@@ -401,21 +409,56 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
       set current-path remove-item 0 current-path
     ]
     [
-      ifelse boxAhead?;;;;;;;;;;;;;;;Si boite ahead;;;;;;;;;;;;;;;;;
-      [print(word "boxahead true")
-        ask personAhead
-          [
-            randomMove
-          ]
-        ;find-shortest-path-to-destination xcor ycor newX newY
+      if boxAhead? and not anyoneAhead?[
+        print(word "Box pas de person")
+        easyMove
+
       ]
-      [print(word "personahead true")
-        ;ask patch-ahead 1
-        ;[
-          ;ask personAhead
-          ;[
-            ;randomMove
-          ;]
+      if boxAhead? and anyoneAhead?[
+        print(word "Box & person: ")
+
+        ifelse deplacement_x > 0[
+          ask personAhead[
+            ask my-links [
+              ask end1 [
+                set destX target-x
+                set destY target-y
+              ]
+            ]
+            if deplacement_x < 0[
+              randomMove
+              find-shortest-path-to-destination xcor ycor destX destY
+            ]
+          ]
+        ]
+        [
+          ask personAhead[
+            ask my-links [
+              ask end1 [
+                set destX target-x
+                set destY target-y
+              ]
+            ]
+            if deplacement_x > 0[
+                randomMove
+              ;set heading 0
+              ;fd 1
+              find-shortest-path-to-destination xcor ycor destX destY
+            ]
+          ]
+        ]
+        ;if deplacement_x = 0[
+        ;  set nb_zero_move (nb_zero_move + 1)
+        ;  if nb_zero_move > 1[
+        ;    randomMove
+        ;    set nb_zero_move 0
+        ;  ]
+        ;]
+      ]
+      if not boxAhead? and anyoneAhead?[
+        print(word "pas Box & person")
+        ;ask personAhead[
+        ; randomMove
         ;]
       ]
     ]
@@ -649,8 +692,8 @@ to randomMove
 end
 
 to move_to
-  rt random 50
-    lt random 50
+  right random 50
+  left random 50
   fd 1
     ;; Si la personne tient une boite
     if[belongsToWorkspace? or belongsToPipe?] of patch-here = false ;; et si elle s'est déplacée hors du Workspace et Pipe
@@ -662,15 +705,17 @@ end
 to take-box
   if not hold_box ;; Si la personne ne tient pas de boite
   [
-     if box-here != nobody ;; et si une boite est présente
+     if any? box-here = true ;; et si une boite est présente
      [
        ask box-here[
-       if count (my-links) = 0 and (color = red or color = blue) ;;and count ((box-on neighbors) with [color]) > 1
-       [
-         create-link-with myself[set tie-mode "fixed"]
-         ask myself[set hold_box true]
-         print (word "boite prise a amener en : " target-x ", " target-y )
-        ]
+         if count (my-links) = 0 and (color = red or color = blue) ;;and count ((box-on neighbors) with [color]) > 1
+         [
+           create-link-with myself[set tie-mode "fixed"]
+           ask myself[
+             set hold_box true
+           ]
+           print (word "boite prise a amener en : " target-x ", " target-y )
+         ]
        ]
      ]
   ]
@@ -725,6 +770,29 @@ to let-box
     print "boxDropped !"
   ]
   ;ask my-out-links[die]
+end
+
+to easyMove
+  let canMove? false
+  set heading 0
+
+
+  while [canMove? != true][
+    ask patch-ahead 1[
+      ifelse any? person-here = false and any? box-here = false[
+        if pcolor != black[
+          set canMove? true
+        ]
+      ]
+      [
+        ask person-here[
+         randomMove
+        ]
+      ]
+    ]
+    right 45
+  ]
+  fd 1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -797,7 +865,7 @@ nb_boxes
 nb_boxes
 1
 100
-37
+25
 1
 1
 NIL

@@ -33,6 +33,8 @@ person-own [
 ]
 
 patches-own[
+  deplacement_x             ;;Soustraction entre la nouvelle position x et l'ancienne.
+  deplacement_y             ;;Soustraction entre la nouvelle position y et l'ancienne.
   belongsToWorkspace?     ;; Boolean that allow to determine if the patch selected belongs to the workspace
   belongsToPipe?          ;; Boolean that allow to determine if the patch selected belongs to the pipe
   parent-patch        ; path's predecessor
@@ -385,7 +387,9 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   [
     ifelse not boxAhead? and not anyoneAhead?
     [
+      let old_position pxcor
       fd 1
+      set deplacement_x (pxcor - old_position)
       move-to first current-path
       if [pxcor] of patch-here != xSource and [pycor] of patch-here != ySource and [pxcor] of patch-here != xDest and [pxcor] of patch-here != yDest
       [
@@ -616,8 +620,8 @@ to change-lights
 end
 
 to randomMove
-  rt random 46
-  lt random 46
+  right random 46
+  left random 46
   let isMoveAheadPossible false
   ifelse accessDeniedForPatch (patch-ahead 1) [
     print (word "accessDeniedForPatch ahead 1")
@@ -724,13 +728,13 @@ to let-box
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-264
+216
 10
-867
-634
-40
-40
-7.33
+936
+551
+-1
+-1
+10.0
 1
 10
 1
@@ -740,10 +744,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--40
-40
--40
-40
+0
+70
+0
+50
 1
 1
 1

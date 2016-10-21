@@ -44,6 +44,13 @@ to creerIntersection [X Y val]
     set label val
     ;set hidden? true
   ]
+  let Xmin (X - road_size)
+  let Xmax (X + road_size)
+  let Ymin (Y - road_size)
+  let Ymax (Y + road_size)
+  ask patches with [(pxcor >= Xmin and pxcor <= Xmax and pycor >= Ymin and pycor <= Ymax)] [
+    set pcolor blue
+  ]
 
 end
 
@@ -122,7 +129,7 @@ CHOOSER
 grid_x
 grid_x
 1 2 3 4 5
-0
+1
 
 CHOOSER
 108

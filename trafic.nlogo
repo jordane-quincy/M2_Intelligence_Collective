@@ -37,9 +37,13 @@ to setup_globals
   set grid_y_inc world-height / grid_y
 end
 
-to creerIntersection [pos_x pos_y i]
+to creerIntersection [X Y val]
   ;;
-
+  create-banner 1 [
+    setxy X Y
+    set label val
+    ;set hidden? true
+  ]
 
 end
 

@@ -4,10 +4,18 @@
 ;;Jordane QUINCY
 
 
-patches-own[
-  intersection?     ;; booleen a vrai si le patch est dans un carrefour
+globals[
+  grid_x_inc
+  grid_y_inc
 
 ]
+
+patches-own[
+  intersection?     ;; booleen a vrai si le patch est dans un carrefour
+  dir ;; "N", "E", etc.
+  ;;TODO : cf modele librairy pour les accidents
+]
+
 
 breed[cars]
 
@@ -18,29 +26,31 @@ breed[cars]
 
 to setup
   clear-all
-  set-default-shape person "person"
-  set-default-shape box "box"
-  set world_width 70
-  set world_height 50
-  set leftStayRed false
-  set rightStayRed false
-
-  resize-world 0 world_width 0 world_height
-
+  setup_globals
   setup-patches
-  setup-boxes
-  setup-persons
+
+  setup-cars
+
+  setup-intersects
 
   reset-ticks
 end
 
+to setup_globals
+  set grid_x_inc world-width / grid_x
+  set grid_y_inc world-height / grid_y
+end
+
 to setup-patches
-  ;;GLOBAL PATCHES
-  ask patches[
-    set belongsToWorkspace? false
-    set belongsToPipe? false
-  ]
-  ;;WORKSPACE PATCHES
+
+end
+
+to setup-cars
+  set-default-shape cars "car"
+end
+
+to setup-intersects
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -75,9 +85,9 @@ CHOOSER
 10
 97
 55
-gridx
-gridx
-1 2 3
+grid_x
+grid_x
+1 2 3 4 5
 0
 
 CHOOSER
@@ -85,9 +95,9 @@ CHOOSER
 11
 200
 56
-gridy
-gridy
-1 2 3
+grid_y
+grid_y
+1 2 3 4 5
 0
 
 CHOOSER

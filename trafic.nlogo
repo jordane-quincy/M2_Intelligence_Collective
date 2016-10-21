@@ -151,14 +151,16 @@ to setup-cars
     ;set current-ticks 0
     set color one-of [ blue red green orange violet ]
     set size 1
-    ;let xCar 0
-    ;let yCar 0
-    ;ask one-of patches with [ (pxcor = min-pxcor + 1 or pxcor = max-pxcor - 1) and (pycor = min-pycor + 1 or pycor = max-pycor - 1) ] [
-    ;  set xCar pxcor
-    ;  set yCar pycor
-    ;]
-    ;;setxy xCar yCar
-    setxy random-xcor random-ycor
+
+    let xCar 0
+    let yCar 0
+    ;on place les voitures sur les extremites des routes
+    ask roads with [ (pxcor = min-pxcor or pxcor = max-pxcor) or (pycor = min-pycor or pycor = max-pycor) ] [
+      set xCar pxcor
+      set yCar pycor
+    ]
+    setxy xCar yCar
+
   ]
 end
 

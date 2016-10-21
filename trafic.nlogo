@@ -16,6 +16,7 @@ globals[
 
 patches-own[
   intersection?     ;; booleen a vrai si le patch est dans un carrefour
+  road?             ;; boolean a vrai si le patch est sur la route.
   dir ;; "N", "E", etc.
   ;;TODO : cf modele librairy pour les accidents
 ]
@@ -130,6 +131,7 @@ to setup-patches
   ;;Initialiser tous les patchs
   ask patches [
     set intersection? false
+    set road? false
     set pcolor brown
   ]
   ;;création intersection
@@ -167,12 +169,6 @@ to setup-cars
     ]
     setxy xCar yCar
 
-    ;au setup, la voiture va dans la direction de la voie sur laquelle elle est déposée
-    let patchDirection 0
-    ask patch-here [
-      set patchDirection dir
-    ]
-    set direction patchDirection
   ]
 end
 
@@ -193,15 +189,21 @@ end
 
 to-report moveEnabled
   let moveEnabled? false
-  if direction = 0[set direction one-of["N" "E" "S" "O"]
+  let carAhead? false
+  let roadAhead? false
+  if direction = 0[set direction one-of["N" "E" "S" "O"]]
   if direction = "N"[set heading 0]
   if direction = "E"[set heading 90]
   if direction = "S"[set heading 180]
   if direction = "O"[set heading 270]
   ask patch-ahead 1 [
     if any? cars-here = false[
-      set moveEnabled? true
+      set carAhead? false
     ]
+    if road?
+  ]
+  if carAhead? = false[
+   set moveEnabled? true
   ]
   report moveEnabled?
 end

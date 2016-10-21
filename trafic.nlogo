@@ -88,6 +88,7 @@ to setup-road
   while [pos_x < max-pxcor] [
      set roads patches with [pxcor >= Xmin and pxcor < Xmax and pycor <= max-pycor and pycor >= min-pycor]
      ask roads [
+       set road? true
        if (intersection? = false) [
          set pcolor white
          ifelse (pxcor < pos_x) [
@@ -108,6 +109,7 @@ to setup-road
   while [pos_y < max-pycor] [
      set roads patches with [pycor >= Ymin and pycor < Ymax and pxcor <= max-pxcor and pxcor >= min-pxcor]
      ask roads [
+       set road? true
        if (intersection? = false) [
          set pcolor white
          ifelse (pycor < pos_y) [
@@ -171,7 +173,7 @@ to setup-cars
       set yCar pycor
     ]
     setxy xCar yCar
- 
+
     ;au setup, la voiture va dans la direction de la voie sur laquelle elle est dÃ©posÃ©e
     let patchDirection 0
     ask patch-here [
@@ -201,11 +203,6 @@ to-report moveEnabled
   let moveEnabled? false
   let carAhead? false
   let roadAhead? false
-  if direction = 0[set direction one-of["N" "E" "S" "O"]]
-  if direction = "N"[set heading 0]
-  if direction = "E"[set heading 90]
-  if direction = "S"[set heading 180]
-  if direction = "O"[set heading 270]
   ask patch-ahead 1 [
     if any? cars-here = false[
       set carAhead? false
@@ -245,8 +242,8 @@ GRAPHICS-WINDOW
 40
 -40
 40
-0
-0
+1
+1
 1
 ticks
 30.0

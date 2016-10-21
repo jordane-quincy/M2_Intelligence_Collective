@@ -11,7 +11,7 @@ globals[
   grid_x_inc
   grid_y_inc
   intersections
-
+  roads
 ]
 
 patches-own[
@@ -51,21 +51,48 @@ to creerIntersection [X Y val]
   ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
     set pcolor blue
   ]
-  ask patches with [(pxcor >= Xmin and pxcor < Xmax)] [
-    if (pcolor != blue) [
-      set pcolor white
-    ]
-  ]
-  ask patches with [(pycor >= Ymin and pycor < Ymax)] [
-    if (pcolor != blue) [
-      set pcolor white
-    ]
-  ]
+  ;ask patches with [(pxcor >= Xmin and pxcor < Xmax)] [
+  ;  if (pcolor != blue) [
+  ;    set pcolor white
+  ;  ]
+  ;]
+  ;ask patches with [(pycor >= Ymin and pycor < Ymax)] [
+  ;  if (pcolor != blue) [
+  ;    set pcolor white
+  ;  ]
+  ;]
 
 end
 
 to setup-road
-
+  let pos_x min-pxcor + 1 + grid_y_inc
+  let Xmin pos_x - road_size
+  let Xmax pos_x + road_size
+  while [pos_x < max-pxcor] [
+     set roads patches with [pxcor >= Xmin and pxcor < Xmax and pycor <= max-pycor and pycor >= min-pycor]
+     ask roads [
+       if (pcolor != blue) [
+         set pcolor white
+       ]
+     ]
+     set pos_x pos_x + grid_y_inc
+     set Xmin pos_x - road_size
+     set Xmax pos_x + road_size
+  ]
+  let pos_y min-pycor + 1 + grid_x_inc
+  let Ymin pos_y - road_size
+  let Ymax pos_y + road_size
+  while [pos_y < max-pycor] [
+     set roads patches with [pycor >= Ymin and pycor < Ymax and pxcor <= max-pxcor and pxcor >= min-pxcor]
+     ask roads [
+       if (pcolor != blue) [
+         set pcolor white
+       ]
+     ]
+     set pos_y pos_y + grid_x_inc
+     set Ymin pos_y - road_size
+     set Ymax pos_y + road_size
+  ]
 end
 
 to setup-patches
@@ -137,7 +164,7 @@ CHOOSER
 grid_x
 grid_x
 1 2 3 4 5
-4
+1
 
 CHOOSER
 108
@@ -147,7 +174,7 @@ CHOOSER
 grid_y
 grid_y
 0 1 2 3 4 5
-5
+2
 
 CHOOSER
 36

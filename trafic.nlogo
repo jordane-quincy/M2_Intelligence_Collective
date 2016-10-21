@@ -144,7 +144,7 @@ to setup-cars
     ;  set xCar pxcor
     ;  set yCar pycor
     ;]
-    ;setxy xCar yCar
+    ;;setxy xCar yCar
     setxy random-xcor random-ycor
   ]
 end

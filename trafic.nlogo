@@ -185,6 +185,36 @@ NIL
 NIL
 1
 
+SLIDER
+13
+238
+185
+271
+num-cars
+num-cars
+0
+400
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+14
+280
+186
+313
+speed-limit
+speed-limit
+0
+1
+0.3
+0.1
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 

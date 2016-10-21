@@ -139,7 +139,7 @@ to setup-patches
   ]
   ;;création intersection
   let pos_y min-pxcor + 1 + floor (grid_x_inc / 2)
-  let i 0
+  let i 0 ;numero (ID) de l'intersection
   while [pos_y < max-pycor] [
     let pos_x min-pycor + 1 + floor (grid_y_inc / 2)
     while [pos_x < max-pxcor] [
@@ -203,15 +203,22 @@ to-report moveEnabled
   let moveEnabled? false
   let carAhead? false
   let roadAhead? false
+  if direction = 0 [set direction one-of["N" "E" "S" "O"]] ;si on est dans un carrefour, on change de direction
+  if direction = "N" [set heading 0]
+  if direction = "E" [set heading 90]
+  if direction = "S" [set heading 180]
+  if direction = "O" [set heading 270]
   ask patch-ahead 1 [
-    if any? cars-here = false[
-      set carAhead? false
+    ; s'il y a une voiture sur le patch devant
+    if any? cars-here = true [
+      set carAhead? true
     ]
-    if road? = true[
+    ; si le patch devant est bien une route
+    if road? = true [
       set roadAhead? true
     ]
   ]
-  if carAhead? = false or roadAhead? = true[
+  if carAhead? = false or roadAhead? = true [
    set moveEnabled? true
   ]
   report moveEnabled?
@@ -256,7 +263,7 @@ CHOOSER
 grid_x
 grid_x
 1 2 3 4 5
-2
+1
 
 CHOOSER
 108

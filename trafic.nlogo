@@ -118,6 +118,9 @@ to setup-road
      set Ymax pos_y + road_size
   ]
   set roads patches with [pcolor = white]
+  ask intersections [
+    set pcolor white
+  ]
 end
 
 to setup-patches
@@ -268,7 +271,7 @@ num-cars
 num-cars
 0
 400
-316
+2
 1
 1
 NIL

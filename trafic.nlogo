@@ -52,6 +52,10 @@ end
 to setup-intersects
 
 end
+
+to go
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -109,6 +113,40 @@ road_size
 road_size
 1 2 3
 0
+
+BUTTON
+18
+125
+81
+158
+setup
+setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+113
+124
+176
+157
+go
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

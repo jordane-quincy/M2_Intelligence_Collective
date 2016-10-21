@@ -25,6 +25,9 @@ cars-own[
   speed-max  ;; vitesse désirée de l’agent
   patience  ;;niveau de patience (dans un stop ou pour dépasser un autre agent)
   max-patience ;; niveau de patience maximum
+  change?  ;;vraie si le véhicule veut changer de voies
+  direction  ;;la direction désirée courante (nord, sud, est, ouest)
+  wait-time  ;;le temps passé depuis son dernier déplacement
 ]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -266,6 +269,16 @@ ahead-vision
 1
 NIL
 HORIZONTAL
+
+CHOOSER
+15
+452
+153
+497
+crossroad-signal
+crossroad-signal
+"none" "signal4"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

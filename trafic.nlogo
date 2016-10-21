@@ -171,6 +171,13 @@ to setup-cars
       set yCar pycor
     ]
     setxy xCar yCar
+ 
+    ;au setup, la voiture va dans la direction de la voie sur laquelle elle est dÃ©posÃ©e
+    let patchDirection 0
+    ask patch-here [
+      set patchDirection dir
+    ]
+    set direction patchDirection
 
   ]
 end

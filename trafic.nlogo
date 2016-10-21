@@ -11,7 +11,7 @@ globals[
   grid_x_inc
   grid_y_inc
   intersections
-
+  roads
 ]
 
 patches-own[
@@ -43,8 +43,8 @@ to setup
 end
 
 to setup_globals
-  set grid_x_inc floor(world-height / (grid_x + 1))
-  set grid_y_inc floor(world-width / (grid_y + 1))
+  set grid_x_inc floor(world-height / grid_x )
+  set grid_y_inc floor(world-width / grid_y)
 end
 
 to creerIntersection [X Y val]
@@ -60,12 +60,51 @@ to creerIntersection [X Y val]
   let Ymax (Y + road_size)
   ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
     set pcolor blue
+    set intersection? true
   ]
+
+  ;ask patches with [(pxcor >= Xmin and pxcor < Xmax)] [
+  ;  if (pcolor != blue) [
+  ;    set pcolor white
+  ;  ]
+  ;]
+  ;ask patches with [(pycor >= Ymin and pycor < Ymax)] [
+  ;  if (pcolor != blue) [
+  ;    set pcolor white
+  ;  ]
+  ;]
 
 end
 
 to setup-road
-
+  let pos_x min-pxcor + 1 + floor (grid_y_inc / 2)
+  let Xmin pos_x - road_size
+  let Xmax pos_x + road_size
+  while [pos_x < max-pxcor] [
+     set roads patches with [pxcor >= Xmin and pxcor < Xmax and pycor <= max-pycor and pycor >= min-pycor]
+     ask roads [
+       if (pcolor != blue) [
+         set pcolor white
+       ]
+     ]
+     set pos_x pos_x + grid_y_inc
+     set Xmin pos_x - road_size
+     set Xmax pos_x + road_size
+  ]
+  let pos_y min-pycor + 1 + floor (grid_x_inc / 2)
+  let Ymin pos_y - road_size
+  let Ymax pos_y + road_size
+  while [pos_y < max-pycor] [
+     set roads patches with [pycor >= Ymin and pycor < Ymax and pxcor <= max-pxcor and pxcor >= min-pxcor]
+     ask roads [
+       if (pcolor != blue) [
+         set pcolor white
+       ]
+     ]
+     set pos_y pos_y + grid_x_inc
+     set Ymin pos_y - road_size
+     set Ymax pos_y + road_size
+  ]
 end
 
 to setup-patches
@@ -75,11 +114,10 @@ to setup-patches
     set pcolor brown
   ]
   ;;création intersection
-  let pos_y min-pxcor + 1 + grid_x_inc
-
+  let pos_y min-pxcor + 1 + floor (grid_x_inc / 2)
+  let i 0
   while [pos_y < max-pycor] [
-    let pos_x min-pycor + 1 + grid_y_inc
-    let i 0
+    let pos_x min-pycor + 1 + floor (grid_y_inc / 2)
     while [pos_x < max-pxcor] [
       set i (i + 1)
       creerIntersection pos_x pos_y i
@@ -93,8 +131,6 @@ to setup-patches
   ;creation routes
   setup-road
 end
-
-
 
 to setup-cars
   set-default-shape cars "car"

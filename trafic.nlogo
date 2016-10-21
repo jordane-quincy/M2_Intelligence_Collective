@@ -11,7 +11,7 @@ globals[
   grid_x_inc
   grid_y_inc
   intersections
-  road
+  roads
 ]
 
 patches-own[
@@ -48,14 +48,52 @@ to creerIntersection [X Y val]
   let Xmax (X + road_size)
   let Ymin (Y - road_size)
   let Ymax (Y + road_size)
-  ask patches with [(pxcor >= Xmin and pxcor <= Xmax and pycor >= Ymin and pycor <= Ymax)] [
+  ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
     set pcolor blue
     set intersection? true
   ]
+  ;ask patches with [(pxcor >= Xmin and pxcor < Xmax)] [
+  ;  if (pcolor != blue) [
+  ;    set pcolor white
+  ;  ]
+  ;]
+  ;ask patches with [(pycor >= Ymin and pycor < Ymax)] [
+  ;  if (pcolor != blue) [
+  ;    set pcolor white
+  ;  ]
+  ;]
 
 end
 
 to setup-road
+  let pos_x min-pxcor + 1 + grid_y_inc
+  let Xmin pos_x - road_size
+  let Xmax pos_x + road_size
+  while [pos_x < max-pxcor] [
+     set roads patches with [pxcor >= Xmin and pxcor < Xmax and pycor <= max-pycor and pycor >= min-pycor]
+     ask roads [
+       if (pcolor != blue) [
+         set pcolor white
+       ]
+     ]
+     set pos_x pos_x + grid_y_inc
+     set Xmin pos_x - road_size
+     set Xmax pos_x + road_size
+  ]
+  let pos_y min-pycor + 1 + grid_x_inc
+  let Ymin pos_y - road_size
+  let Ymax pos_y + road_size
+  while [pos_y < max-pycor] [
+     set roads patches with [pycor >= Ymin and pycor < Ymax and pxcor <= max-pxcor and pxcor >= min-pxcor]
+     ask roads [
+       if (pcolor != blue) [
+         set pcolor white
+       ]
+     ]
+     set pos_y pos_y + grid_x_inc
+     set Ymin pos_y - road_size
+     set Ymax pos_y + road_size
+  ]
 end
 
 to setup-patches
@@ -93,11 +131,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-868
-689
-40
-40
-8.0
+830
+651
+30
+30
+10.0
 1
 10
 1
@@ -107,10 +145,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--40
-40
--40
-40
+-30
+30
+-30
+30
 0
 0
 1
@@ -125,7 +163,7 @@ CHOOSER
 grid_x
 grid_x
 1 2 3 4 5
-2
+1
 
 CHOOSER
 108
@@ -135,7 +173,7 @@ CHOOSER
 grid_y
 grid_y
 0 1 2 3 4 5
-3
+2
 
 CHOOSER
 36
@@ -180,6 +218,36 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+13
+238
+185
+271
+num-cars
+num-cars
+0
+400
+2
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+14
+280
+186
+313
+speed-limit
+speed-limit
+0
+1
+0.3
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

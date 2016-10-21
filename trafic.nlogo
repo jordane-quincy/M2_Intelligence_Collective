@@ -66,9 +66,10 @@ to setup-patches
   ]
   ;;création intersection
   let pos_y min-pxcor + 1 + grid_x_inc
-  let i 0
+
   while [pos_y < max-pycor] [
     let pos_x min-pycor + 1 + grid_y_inc
+    let i 0
     while [pos_x < max-pxcor] [
       set i (i + 1)
       creerIntersection pos_x pos_y i
@@ -76,8 +77,9 @@ to setup-patches
     ]
     set pos_y pos_y + grid_x_inc
   ]
-  set i (i + 1)
+
   set intersections patches with [pcolor = blue]
+
   ;creation routes
   setup-road
 end
@@ -209,6 +211,51 @@ speed-limit
 1
 0.3
 0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+14
+324
+186
+357
+acceleration
+acceleration
+0
+0.099
+0.0499
+0.0001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+368
+187
+401
+deceleration
+deceleration
+0
+0.099
+0.075
+0.001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+411
+187
+444
+ahead-vision
+ahead-vision
+0
+3
+1
+1
 1
 NIL
 HORIZONTAL

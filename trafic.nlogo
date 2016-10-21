@@ -4,9 +4,13 @@
 ;;Jordane QUINCY
 
 
+breed[cars]
+breed[banner]
+
 globals[
   grid_x_inc
   grid_y_inc
+  intersections
 
 ]
 
@@ -16,10 +20,6 @@ patches-own[
   ;;TODO : cf modele librairy pour les accidents
 ]
 
-
-breed[cars]
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Setup procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -28,11 +28,7 @@ to setup
   clear-all
   setup_globals
   setup-patches
-
   setup-cars
-
-  setup-intersects
-
   reset-ticks
 end
 
@@ -43,6 +39,12 @@ end
 
 to creerIntersection [pos_x pos_y i]
   ;;
+
+
+end
+
+to setup-road
+
 end
 
 to setup-patches
@@ -65,15 +67,16 @@ to setup-patches
     set pos_x pos_x + floor(grid_x_inc / 2)
   ]
 
+  set intersections patches with [pcolor = blue]
 
+  ;creation routes
+  setup-road
 end
+
+
 
 to setup-cars
   set-default-shape cars "car"
-end
-
-to setup-intersects
-
 end
 
 to go

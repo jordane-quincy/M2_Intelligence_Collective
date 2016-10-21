@@ -1,3 +1,8 @@
+;;Exo Trafic routier
+;;Maxime DEGRES
+;;Jean-Baptiste DURIEZ
+;;Jordane QUINCY
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 210

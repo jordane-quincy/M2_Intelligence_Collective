@@ -164,6 +164,12 @@ to setup-cars
     ]
     setxy xCar yCar
 
+    ;au setup, la voiture va dans la direction de la voie sur laquelle elle est déposée
+    let patchDirection 0
+    ask patch-here [
+      set patchDirection dir
+    ]
+    set direction patchDirection
   ]
 end
 

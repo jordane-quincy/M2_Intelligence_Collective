@@ -74,6 +74,12 @@ to setup-road
      ask roads [
        if (pcolor != blue) [
          set pcolor white
+         ifelse (pxcor < pos_x) [
+           set dir "S"
+         ]
+         [
+           set dir "N"
+         ]
        ]
      ]
      set pos_x pos_x + grid_y_inc
@@ -88,12 +94,19 @@ to setup-road
      ask roads [
        if (pcolor != blue) [
          set pcolor white
+         ifelse (pycor < pos_y) [
+           set dir "E"
+         ]
+         [
+           set dir "O"
+         ]
        ]
      ]
      set pos_y pos_y + grid_x_inc
      set Ymin pos_y - road_size
      set Ymax pos_y + road_size
   ]
+  set roads patches with [pcolor white]
 end
 
 to setup-patches

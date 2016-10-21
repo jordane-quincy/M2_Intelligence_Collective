@@ -1,8 +1,3 @@
-;;Exo Trafic routier
-;;Maxime DEGRES
-;;Jean-Baptiste DURIEZ
-;;Jordane QUINCY
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -30,6 +25,36 @@ GRAPHICS-WINDOW
 1
 ticks
 30.0
+
+CHOOSER
+5
+10
+97
+55
+gridx
+gridx
+1 2 3
+0
+
+CHOOSER
+108
+11
+200
+56
+gridy
+gridy
+1 2 3
+0
+
+CHOOSER
+36
+64
+174
+109
+road_size
+road_size
+1 2 3
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

@@ -29,6 +29,9 @@ cars-own[
   direction  ;;la direction désirée courante (nord, sud, est, ouest)
   wait-time  ;;le temps passé depuis son dernier déplacement
 ]
+banner-own[
+ frequenceLights
+]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Setup procedures ;;;
@@ -167,8 +170,38 @@ to setup-cars
   ]
 end
 
-to go
+to setup-lights
+  ask intersections[
 
+  ]
+end
+
+to go
+  ask cars[
+    if moveEnabled[
+      move
+    ]
+  ]
+  tick
+end
+
+to-report moveEnabled
+  let moveEnabled? false
+  if direction = 0[set direction one-of["N" "E" "S" "O"]
+  if direction = "N"[set heading 0]
+  if direction = "E"[set heading 90]
+  if direction = "S"[set heading 180]
+  if direction = "O"[set heading 270]
+  ask patch-ahead 1 [
+    if any? cars-here = false[
+      set moveEnabled? true
+    ]
+  ]
+  report moveEnabled?
+end
+
+to move
+  fd 1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -271,7 +304,7 @@ num-cars
 num-cars
 0
 400
-2
+89
 1
 1
 NIL

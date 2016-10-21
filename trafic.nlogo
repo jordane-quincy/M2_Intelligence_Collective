@@ -41,6 +41,10 @@ to setup_globals
   set grid_y_inc world-height / grid_y
 end
 
+to creerIntersection [pos_x pos_y i]
+  ;;
+end
+
 to setup-patches
   ;;Initialiser tous les patchs
   ask patches [
@@ -49,7 +53,17 @@ to setup-patches
   ]
   ;;création intersection
   let pos_x min-pxcor + 1 + floor(grid_x_inc / 2)
-  let pos_y min-pycor + 1 + floor(grid_y_inc / 2)
+
+  while [pos_x < max-pxcor] [
+    let pos_y min-pycor + 1 + floor(grid_y_inc / 2)
+    let i 0
+    while [pos_y < max-pycor] [
+      set i (i + 1)
+      creerIntersection pos_x pos_y i
+      set pos_y pos_y + floor(grid_y_inc / 2)
+    ]
+    set pos_x pos_x + floor(grid_x_inc / 2)
+  ]
 
 
 end

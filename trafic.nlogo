@@ -11,7 +11,7 @@ globals[
   grid_x_inc
   grid_y_inc
   intersections
-
+  road
 ]
 
 patches-own[
@@ -50,12 +50,12 @@ to creerIntersection [X Y val]
   let Ymax (Y + road_size)
   ask patches with [(pxcor >= Xmin and pxcor <= Xmax and pycor >= Ymin and pycor <= Ymax)] [
     set pcolor blue
+    set intersection? true
   ]
 
 end
 
 to setup-road
-
 end
 
 to setup-patches
@@ -81,8 +81,6 @@ to setup-patches
   ;creation routes
   setup-road
 end
-
-
 
 to setup-cars
   set-default-shape cars "car"

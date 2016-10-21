@@ -48,7 +48,7 @@ to creerIntersection [X Y val]
   let Xmax (X + road_size)
   let Ymin (Y - road_size)
   let Ymax (Y + road_size)
-  ask patches with [(pxcor >= Xmin and pxcor <= Xmax and pycor >= Ymin and pycor <= Ymax)] [
+  ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
     set pcolor blue
   ]
 

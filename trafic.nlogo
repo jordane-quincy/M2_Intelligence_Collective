@@ -13,6 +13,33 @@ patches-own[
   h                   ; the value of heuristic cost function h()
   colorForAStar       ; color of the patch for a star (we don't want the patch colored in the environment)
 ]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Setup procedures ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+to setup
+  clear-all
+  set-default-shape person "person"
+  set-default-shape box "box"
+  set world_width 70
+  set world_height 50
+  set leftStayRed false
+  set rightStayRed false
+
+  resize-world 0 world_width 0 world_height
+
+  setup-patches
+  setup-boxes
+  setup-persons
+
+  reset-ticks
+end
+
+to setup-patches
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210

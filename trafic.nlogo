@@ -50,6 +50,7 @@ to creerIntersection [X Y val]
   let Ymax (Y + road_size)
   ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
     set pcolor blue
+    set intersection? true
   ]
   ;ask patches with [(pxcor >= Xmin and pxcor < Xmax)] [
   ;  if (pcolor != blue) [
@@ -118,8 +119,6 @@ to setup-patches
   ;creation routes
   setup-road
 end
-
-
 
 to setup-cars
   set-default-shape cars "car"

@@ -200,9 +200,11 @@ to-report moveEnabled
     if any? cars-here = false[
       set carAhead? false
     ]
-    if road?
+    if road? = true[
+      set roadAhead = true
+    ]
   ]
-  if carAhead? = false[
+  if carAhead? = false or roadAhead? = true[
    set moveEnabled? true
   ]
   report moveEnabled?

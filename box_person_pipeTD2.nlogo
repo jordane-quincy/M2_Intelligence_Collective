@@ -360,18 +360,27 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
     if (any? box-here with [who != num_box]) = true; and not any? person-here
     [
       set boxAhead? true
+      ;Permet de voir si la boite rencontré possede une personne
+      ask box-here[
+       ask my-links [
+          ask end0[
+            set anyoneAhead? true
+            set personAhead person-here
+            ;print(word "patch box: " patch-here)
+          ]
+      ]
     ]
   ]
 
-  ask patch-ahead 2
-  [
-     if any? person-here
-     [
-       set anyoneAhead? true
-       set boxAhead? false
-       set personAhead person-here
-     ]
-  ]
+  ;Permet de voir si la boite
+  ;ask patch-ahead 2
+  ;[
+     ;if any? person-here
+     ;[
+       ;set anyoneAhead? true
+       ;set personAhead person-here
+     ;]
+  ;]
 
   if not patchAheadIsRed
   [
@@ -391,17 +400,20 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
     [
       ifelse boxAhead?;;;;;;;;;;;;;;;Si boite ahead;;;;;;;;;;;;;;;;;
       [print(word "boxahead true")
-        ;randomMove
-        ;find-shortest-path-to-destination xcor ycor newX newY
-      ]
-      [print(word "personahead true")
-        ask patch-ahead 1
-        [
-          ask personAhead
+        ask personAhead
           [
             randomMove
           ]
-        ]
+        ;find-shortest-path-to-destination xcor ycor newX newY
+      ]
+      [print(word "personahead true")
+        ;ask patch-ahead 1
+        ;[
+          ;ask personAhead
+          ;[
+            ;randomMove
+          ;]
+        ;]
       ]
     ]
   ]

@@ -42,6 +42,15 @@ to setup_globals
 end
 
 to setup-patches
+  ;;Initialiser tous les patchs
+  ask patches [
+    set intersection? false
+    set pcolor brown
+  ]
+  ;;création intersection
+  let pos_x min-pxcor + 1 + floor(grid_x_inc / 2)
+  let pos_y min-pycor + 1 + floor(grid_y_inc / 2)
+
 
 end
 
@@ -101,8 +110,8 @@ CHOOSER
 56
 grid_y
 grid_y
-1 2 3 4 5
-0
+0 1 2 3 4 5
+1
 
 CHOOSER
 36

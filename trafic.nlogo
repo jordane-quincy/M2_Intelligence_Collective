@@ -137,7 +137,7 @@ to setup-patches
   ]
   ;;création intersection
   let pos_y min-pxcor + 1 + floor (grid_x_inc / 2)
-  let i 0
+  let i 0 ;numero (ID) de l'intersection
   while [pos_y < max-pycor] [
     let pos_x min-pycor + 1 + floor (grid_y_inc / 2)
     while [pos_x < max-pxcor] [
@@ -171,7 +171,7 @@ to setup-cars
       set yCar pycor
     ]
     setxy xCar yCar
- 
+
     ;au setup, la voiture va dans la direction de la voie sur laquelle elle est dÃ©posÃ©e
     let patchDirection 0
     ask patch-here [

@@ -51,7 +51,7 @@ to setup_globals
 end
 
 to creerIntersection [X Y val]
-  ;;
+  ;creation du banner au millieu de l'intersection
   create-banner 1 [
     setxy X Y
     set label val
@@ -61,8 +61,9 @@ to creerIntersection [X Y val]
   let Xmax (X + road_size)
   let Ymin (Y - road_size)
   let Ymax (Y + road_size)
+  ;on prends les patchs dans le carré autour du banner
   ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
-    set pcolor blue
+    ;set pcolor blue
     set intersection? true
   ]
 
@@ -145,10 +146,12 @@ to setup-patches
     set pos_y pos_y + grid_x_inc
   ]
 
-  set intersections patches with [pcolor = blue]
+  ; peuplement des intersections
+  set intersections patches with [intersection? = true]
 
   ;creation routes
   setup-road
+
 end
 
 to setup-cars
@@ -193,7 +196,7 @@ end
 
 to-report moveEnabled
   let moveEnabled? false
-  if direction = 0[set direction one-of["N" "E" "S" "O"]
+  if direction = 0[set direction one-of["N" "E" "S" "O"]]
   if direction = "N"[set heading 0]
   if direction = "E"[set heading 90]
   if direction = "S"[set heading 180]

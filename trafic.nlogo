@@ -204,7 +204,7 @@ to-report moveEnabled
       set carAhead? false
     ]
     if road? = true[
-      set roadAhead = true
+      set roadAhead? true
     ]
   ]
   if carAhead? = false or roadAhead? = true[

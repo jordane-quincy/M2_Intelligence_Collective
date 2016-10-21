@@ -20,6 +20,13 @@ patches-own[
   ;;TODO : cf modele librairy pour les accidents
 ]
 
+cars-own[
+  speed  ;;vitesse courante
+  speed-max  ;; vitesse désirée de l’agent
+  patience  ;;niveau de patience (dans un stop ou pour dépasser un autre agent)
+  max-patience ;; niveau de patience maximum
+]
+
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Setup procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;

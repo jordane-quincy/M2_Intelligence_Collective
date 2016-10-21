@@ -1,18 +1,15 @@
-;;Exo TD
+;;Exo TP Traffic
 ;;Maxime DEGRES
 ;;Jean-Baptiste DURIEZ
 ;;Jordane QUINCY
-;
+
 
 patches-own[
-  belongsToWorkspace?     ;; Boolean that allow to determine if the patch selected belongs to the workspace
-  belongsToPipe?          ;; Boolean that allow to determine if the patch selected belongs to the pipe
-  parent-patch        ; path's predecessor
-  f                   ; the value of knowledge plus heuristic cost function f()
-  g                   ; the value of knowledge cost function g()
-  h                   ; the value of heuristic cost function h()
-  colorForAStar       ; color of the patch for a star (we don't want the patch colored in the environment)
+  intersection?     ;; booleen a vrai si le patch est dans un carrefour
+
 ]
+
+breed[cars]
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -38,7 +35,12 @@ to setup
 end
 
 to setup-patches
-
+  ;;GLOBAL PATCHES
+  ask patches[
+    set belongsToWorkspace? false
+    set belongsToPipe? false
+  ]
+  ;;WORKSPACE PATCHES
 end
 @#$#@#$#@
 GRAPHICS-WINDOW

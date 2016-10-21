@@ -117,7 +117,7 @@ to setup-road
      set Ymin pos_y - road_size
      set Ymax pos_y + road_size
   ]
-  set roads patches with [pcolor white]
+  set roads patches with [pcolor = white]
 end
 
 to setup-patches

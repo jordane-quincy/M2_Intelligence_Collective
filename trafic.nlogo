@@ -68,7 +68,6 @@ to setup-patches
   let pos_y min-pxcor + 1 + grid_x_inc
 
   while [pos_y < max-pycor] [
-    show grid_x_inc
     let pos_x min-pycor + 1 + grid_y_inc
     let i 0
     while [pos_x < max-pxcor] [

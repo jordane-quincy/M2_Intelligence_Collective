@@ -20,6 +20,16 @@ patches-own[
   ;;TODO : cf modele librairy pour les accidents
 ]
 
+cars-own[
+  speed  ;;vitesse courante
+  speed-max  ;; vitesse désirée de l’agent
+  patience  ;;niveau de patience (dans un stop ou pour dépasser un autre agent)
+  max-patience ;; niveau de patience maximum
+  change?  ;;vraie si le véhicule veut changer de voies
+  direction  ;;la direction désirée courante (nord, sud, est, ouest)
+  wait-time  ;;le temps passé depuis son dernier déplacement
+]
+
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Setup procedures ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -52,6 +62,7 @@ to creerIntersection [X Y val]
     set pcolor blue
     set intersection? true
   ]
+
   ;ask patches with [(pxcor >= Xmin and pxcor < Xmax)] [
   ;  if (pcolor != blue) [
   ;    set pcolor white
@@ -127,14 +138,28 @@ to setup-patches
     ]
     set pos_y pos_y + grid_x_inc
   ]
-  set i (i + 1)
+
   set intersections patches with [pcolor = blue]
+
   ;creation routes
   setup-road
 end
 
 to setup-cars
   set-default-shape cars "car"
+  create-cars num-cars [
+    ;set current-ticks 0
+    set color one-of [ blue red green orange violet ]
+    set size 1
+    ;let xCar 0
+    ;let yCar 0
+    ;ask one-of patches with [ (pxcor = min-pxcor + 1 or pxcor = max-pxcor - 1) and (pycor = min-pycor + 1 or pycor = max-pycor - 1) ] [
+    ;  set xCar pxcor
+    ;  set yCar pycor
+    ;]
+    ;;setxy xCar yCar
+    setxy random-xcor random-ycor
+  ]
 end
 
 to go
@@ -144,11 +169,11 @@ end
 GRAPHICS-WINDOW
 210
 10
-830
-651
-30
-30
-10.0
+868
+689
+40
+40
+8.0
 1
 10
 1
@@ -158,10 +183,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--30
-30
--30
-30
+-40
+40
+-40
+40
 0
 0
 1
@@ -176,7 +201,7 @@ CHOOSER
 grid_x
 grid_x
 1 2 3 4 5
-4
+2
 
 CHOOSER
 108
@@ -186,7 +211,7 @@ CHOOSER
 grid_y
 grid_y
 0 1 2 3 4 5
-5
+3
 
 CHOOSER
 36
@@ -241,7 +266,7 @@ num-cars
 num-cars
 0
 400
-2
+316
 1
 1
 NIL
@@ -261,6 +286,61 @@ speed-limit
 1
 NIL
 HORIZONTAL
+
+SLIDER
+14
+324
+186
+357
+acceleration
+acceleration
+0
+0.099
+0.0499
+0.0001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+368
+187
+401
+deceleration
+deceleration
+0
+0.099
+0.075
+0.001
+1
+NIL
+HORIZONTAL
+
+SLIDER
+15
+411
+187
+444
+ahead-vision
+ahead-vision
+0
+3
+1
+1
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+15
+452
+153
+497
+crossroad-signal
+crossroad-signal
+"none" "signal4"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

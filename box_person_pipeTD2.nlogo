@@ -363,11 +363,10 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
       ;Permet de voir si la boite rencontré possede une personne
       ask box-here[
        ask my-links [
-          ask end0[
-            set anyoneAhead? true
-            set personAhead person-here
-            ;print(word "patch box: " patch-here)
-          ]
+         set anyoneAhead? true
+         set personAhead end2
+         print(word "lien entre box & person")
+       ]
       ]
     ]
   ]

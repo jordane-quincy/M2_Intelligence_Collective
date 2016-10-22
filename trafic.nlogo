@@ -31,7 +31,8 @@ cars-own[
   wait-time  ;;le temps passé depuis son dernier déplacement
 ]
 banner-own[
- frequenceLights
+  frequenceRedGreen ;Nombre de ticks avan passage du rouge au vert et du vert au orange.
+  frequenceOrange   ;Nombre de ticks avant passage du orange au rouge.
 ]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -43,6 +44,8 @@ to setup
   setup_globals
   setup-patches
   setup-cars
+  setup-banners
+  setup-lights
   reset-ticks
 end
 
@@ -51,17 +54,25 @@ to setup_globals
   set grid_y_inc floor(world-width / grid_y)
 end
 
+to setup-banners
+  ask banner[
+    set frequenceRedGreen 50
+    set frequenceOrange 10
+  ]
+end
+
 to creerIntersection [X Y val]
   ;creation du banner au millieu de l'intersection
+  let Xmin (X - road_size)
+  let Xmax (X + road_size)
+  let Ymin (Y - road_size)
+  let Ymax (Y + road_size)
   create-banner 1 [
     setxy X Y
     set label val
     ;set hidden? true
   ]
-  let Xmin (X - road_size)
-  let Xmax (X + road_size)
-  let Ymin (Y - road_size)
-  let Ymax (Y + road_size)
+
   ;on prends les patchs dans le carré autour du banner
   ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
     ;set pcolor blue
@@ -185,8 +196,10 @@ to setup-cars
 end
 
 to setup-lights
-  ask intersections[
-
+  ask banner[
+    ask patch-at (- road_size - 1) 0[
+     set pcolor green
+    ]
   ]
 end
 
@@ -221,11 +234,11 @@ to-report moveEnabled
     set shape "cartowest"
   ]
   ask patch-ahead 1 [
-    ; s'il y a une voiture sur le patch devant
+    ; S'il y a une voiture sur le patch devant
     if any? cars-here = true [
       set carAhead? true
     ]
-    ; si le patch devant est bien une route
+    ; Si le patch devant est bien une route
     if road? = true [
       set roadAhead? true
     ]

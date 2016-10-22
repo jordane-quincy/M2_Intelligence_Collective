@@ -204,10 +204,22 @@ to-report moveEnabled
   let carAhead? false
   let roadAhead? false
   if direction = 0 [set direction one-of["N" "E" "S" "O"]] ;si on est dans un carrefour, on change de direction
-  if direction = "N" [set heading 0]
-  if direction = "E" [set heading 90]
-  if direction = "S" [set heading 180]
-  if direction = "O" [set heading 270]
+  if direction = "N" [
+    set heading 0
+    set shape "cartonorth"
+  ]
+  if direction = "E" [
+    set heading 90
+    set shape "car"
+  ]
+  if direction = "S" [
+    set heading 180
+    set shape "cartosouth"
+  ]
+  if direction = "O" [
+    set heading 270
+    set shape "cartowest"
+  ]
   ask patch-ahead 1 [
     ; s'il y a une voiture sur le patch devant
     if any? cars-here = true [
@@ -328,7 +340,7 @@ num-cars
 num-cars
 0
 400
-89
+201
 1
 1
 NIL
@@ -343,7 +355,7 @@ speed-limit
 speed-limit
 0
 1
-0.3
+0.1
 0.1
 1
 NIL
@@ -496,6 +508,36 @@ Circle -16777216 true false 30 180 90
 Polygon -16777216 true false 162 80 132 78 134 135 209 135 194 105 189 96 180 89
 Circle -7500403 true true 47 195 58
 Circle -7500403 true true 195 195 58
+
+cartonorth
+false
+0
+Polygon -7500403 true true 180 0 164 21 144 39 135 60 132 74 106 87 84 97 63 115 50 141 50 165 60 225 150 300 165 300 225 300 225 0 180 0
+Circle -16777216 true false 180 30 90
+Circle -16777216 true false 180 180 90
+Polygon -16777216 true false 80 138 78 168 135 166 135 91 105 106 96 111 89 120
+Circle -7500403 true true 195 195 58
+Circle -7500403 true true 195 47 58
+
+cartosouth
+false
+0
+Polygon -7500403 true true 120 300 136 279 156 261 165 240 168 226 194 213 216 203 237 185 250 159 250 135 240 75 150 0 135 0 75 0 75 300 120 300
+Circle -16777216 true false 30 180 90
+Circle -16777216 true false 30 30 90
+Polygon -16777216 true false 220 162 222 132 165 134 165 209 195 194 204 189 211 180
+Circle -7500403 true true 47 47 58
+Circle -7500403 true true 47 195 58
+
+cartowest
+false
+0
+Polygon -7500403 true true 0 180 21 164 39 144 60 135 74 132 87 106 97 84 115 63 141 50 165 50 225 60 300 150 300 165 300 225 0 225 0 180
+Circle -16777216 true false 30 180 90
+Circle -16777216 true false 180 180 90
+Polygon -16777216 true false 138 80 168 78 166 135 91 135 106 105 111 96 120 89
+Circle -7500403 true true 195 195 58
+Circle -7500403 true true 47 195 58
 
 circle
 false

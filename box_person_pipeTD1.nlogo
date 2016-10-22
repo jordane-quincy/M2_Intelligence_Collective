@@ -693,7 +693,7 @@ pipe_width
 pipe_width
 0
 4
-1
+4
 1
 1
 NIL

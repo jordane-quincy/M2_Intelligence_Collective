@@ -392,8 +392,9 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
   if not patchAheadIsRed
   [
     ;set deplacement_x 0
-    ifelse not anyoneAhead? and not boxAhead?
-    [print(word "Pas de box pas de person")
+    ifelse not anyoneAhead? and not boxAhead? or boxAhead? and not anyoneAhead?
+    [
+      print(word "Pas de box pas de person")
       let old_position xcor
       fd 1
       set deplacement_x (xcor - old_position)
@@ -409,16 +410,16 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
       set current-path remove-item 0 current-path
     ]
     [
-      if boxAhead? and not anyoneAhead?[
-        print(word "Box pas de person")
-        easyMove
-
-      ]
+      ;if boxAhead? and not anyoneAhead?[
+      ;  print(word "Box pas de person")
+      ;  randomMove
+      ;]
       if boxAhead? and anyoneAhead?[
         print(word "Box & person: ")
 
         ifelse deplacement_x > 0[
           ask personAhead[
+            set personAhead person-here
             ask my-links [
               ask end1 [
                 set destX target-x
@@ -426,13 +427,20 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
               ]
             ]
             if deplacement_x < 0[
-              randomMove
+              ask personAhead[
+                randomMove
+                easyMove
+              ]
+              ;randomMove
+              ;set heading 0
+              ;fd 1
               find-shortest-path-to-destination xcor ycor destX destY
             ]
           ]
         ]
         [
           ask personAhead[
+            set personAhead person-here
             ask my-links [
               ask end1 [
                 set destX target-x
@@ -440,7 +448,11 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
               ]
             ]
             if deplacement_x > 0[
+              ask personAhead[
                 randomMove
+                easyMove
+              ]
+              ;randomMove
               ;set heading 0
               ;fd 1
               find-shortest-path-to-destination xcor ycor destX destY
@@ -458,7 +470,7 @@ to go-to-next-patch-in-current-path [xSource ySource xDest yDest]
       if not boxAhead? and anyoneAhead?[
         print(word "pas Box & person")
         ;ask personAhead[
-        ; randomMove
+         randomMove
         ;]
       ]
     ]
@@ -776,23 +788,19 @@ to easyMove
   let canMove? false
   set heading 0
 
-
-  while [canMove? != true][
-    ask patch-ahead 1[
-      ifelse any? person-here = false and any? box-here = false[
-        if pcolor != black[
-          set canMove? true
-        ]
-      ]
-      [
-        ask person-here[
-         randomMove
-        ]
+  ask patch-ahead 1[
+    ifelse any? person-here = false and any? box-here = false[
+      if pcolor != black[
+        set canMove? true
       ]
     ]
-    right 45
+    [
+
+    ]
   ]
-  fd 1
+  if canMove? = true[
+    fd 1
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW

@@ -5,7 +5,7 @@
 
 
 breed[cars]
-breed[banner]
+breed[banners]
 
 globals[
   grid_x_inc
@@ -30,7 +30,7 @@ cars-own[
   direction  ;;la direction désirée courante (nord, sud, est, ouest)
   wait-time  ;;le temps passé depuis son dernier déplacement
 ]
-banner-own[
+banners-own[
   frequenceRedGreen ;Nombre de ticks avan passage du rouge au vert et du vert au orange.
   frequenceOrange   ;Nombre de ticks avant passage du orange au rouge.
 ]
@@ -55,7 +55,7 @@ to setup_globals
 end
 
 to setup-banners
-  ask banner[
+  ask banners[
     set frequenceRedGreen 50
     set frequenceOrange 10
   ]
@@ -67,7 +67,7 @@ to creerIntersection [X Y val]
   let Xmax (X + road_size)
   let Ymin (Y - road_size)
   let Ymax (Y + road_size)
-  create-banner 1 [
+  create-banners 1 [
     setxy X Y
     set label val
     ;set hidden? true
@@ -196,26 +196,58 @@ to setup-cars
 end
 
 to setup-lights
-  ask banner[
-    ask patch-at (- road_size - 1) 0[
-     set pcolor green
+  let i 0
+  while[i < road_size][
+    ask banners[
+      ask patch-at road_size i[;(xcor - road_size - 1) (ycor + road_size - i)[
+        set pcolor green
+      ]
+      ask patch-at (- road_size + i) road_size[;(xcor - road_size - 1) (ycor + road_size - i)[
+        set pcolor red
+      ]
     ]
+    set i (i + 1)
   ]
 end
 
 to go
   ask cars[
-    if moveEnabled[
+
+    if setNextMovement[
       move
     ]
   ]
   tick
 end
 
-to-report moveEnabled
+to-report moveAhead [patchAhead]
   let moveEnabled? false
+  let lightIsRed? false
   let carAhead? false
   let roadAhead? false
+  ask patch-ahead 1[
+    ;Si le feu(patch) est rouge on ne peut passer
+    if pcolor = red[
+      set lightIsRed? true
+    ]
+    ;S'il y a une voiture sur le patch devant
+    if any? cars-here = true [
+      set carAhead? true
+    ]
+    ;Si le patch devant est bien une route
+    if road? = true [
+      set roadAhead? true
+    ]
+  ]
+  if lightIsRed? = false and carAhead? = false and roadAhead? = true[
+    set moveEnabled? true
+  ]
+
+  report moveEnabled?
+end
+
+to-report setNextMovement
+  let moveEnabled? false
   if direction = 0 [set direction one-of["N" "E" "S" "O"]] ;si on est dans un carrefour, on change de direction
   if direction = "N" [
     set heading 0
@@ -233,20 +265,8 @@ to-report moveEnabled
     set heading 270
     set shape "cartowest"
   ]
-  ask patch-ahead 1 [
-    ; S'il y a une voiture sur le patch devant
-    if any? cars-here = true [
-      set carAhead? true
-    ]
-    ; Si le patch devant est bien une route
-    if road? = true [
-      set roadAhead? true
-    ]
-  ]
-  if carAhead? = false or roadAhead? = true [
-   set moveEnabled? true
-  ]
-  report moveEnabled?
+
+  report moveAhead 1
 end
 
 to move
@@ -308,7 +328,7 @@ CHOOSER
 road_size
 road_size
 1 2 3
-0
+1
 
 BUTTON
 18

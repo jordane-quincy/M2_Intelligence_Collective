@@ -31,8 +31,9 @@ cars-own[
   wait-time  ;;le temps passé depuis son dernier déplacement
 ]
 banners-own[
-  frequenceRedGreen ;Nombre de ticks avan passage du rouge au vert et du vert au orange.
+  frequenceRedGreen ;Nombre de ticks avant passage du rouge au vert et du vert au orange.
   frequenceOrange   ;Nombre de ticks avant passage du orange au rouge.
+  time  ;Nombre de ticks
 ]
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -57,7 +58,8 @@ end
 to setup-banners
   ask banners[
     set frequenceRedGreen 50
-    set frequenceOrange 10
+    set frequenceOrange frequenceRedGreen / 5
+    set time 0
   ]
 end
 
@@ -70,7 +72,7 @@ to creerIntersection [X Y val]
   create-banners 1 [
     setxy X Y
     set label val
-    ;set hidden? true
+    set hidden? true
   ]
 
   ;on prends les patchs dans le carré autour du banner
@@ -199,11 +201,100 @@ to setup-lights
   let i 0
   while[i < road_size][
     ask banners[
-      ask patch-at road_size i[;(xcor - road_size - 1) (ycor + road_size - i)[
+      ask patch-at road_size i[
         set pcolor green
       ]
-      ask patch-at (- road_size + i) road_size[;(xcor - road_size - 1) (ycor + road_size - i)[
+      ask patch-at (- road_size + i) road_size[
         set pcolor red
+      ]
+      ask patch-at (- road_size - 1) (- road_size + i)[
+        set pcolor green
+      ]
+      ask patch-at (i) (- road_size - 1)[
+        set pcolor red
+      ]
+    ]
+    set i (i + 1)
+  ]
+end
+
+to change-lights
+  let i 0
+  let time_before_green 0 ;Pour passer au rouge ou vert selon le feu
+  let time_before_red 0   ;Pour passer au rouge apres orange
+  let nb_ticks ticks
+
+  while[i < road_size][
+    ask banners[
+        print(word "ticks: " ticks " time * frequenceRedGreen: " frequenceRedGreen)
+      if ticks - time = frequenceRedGreen or ticks - time = (frequenceRedGreen + frequenceOrange)[
+        if ticks - time = frequenceRedGreen[
+          ask patch-at road_size i[
+            if pcolor = green[
+              set pcolor orange
+            ]
+          ]
+          ask patch-at (- road_size - 1) (- road_size + i)[
+            if pcolor = green[
+              set pcolor orange
+            ]
+          ]
+          ask patch-at (- road_size + i) road_size[
+            if pcolor = green[
+              set pcolor orange
+            ]
+          ]
+          ask patch-at (i) (- road_size - 1)[
+            if pcolor = green[
+              set pcolor orange
+            ]
+          ]
+        ]
+        if ticks - time = (frequenceRedGreen + frequenceOrange)[
+          ask patch-at road_size i[
+            if pcolor = red[
+              set pcolor green
+            ]
+          ]
+          ask patch-at (- road_size - 1) (- road_size + i)[
+            if pcolor = red[
+              set pcolor green
+            ]
+          ]
+          ask patch-at (- road_size + i) road_size[
+            if pcolor = red[
+              set pcolor green
+            ]
+          ]
+          ask patch-at (i) (- road_size - 1)[
+            if pcolor = red[
+              set pcolor green
+            ]
+          ]
+        ]
+        if ticks - time = (frequenceRedGreen + frequenceOrange)[
+          if i = (road_size - 1)[set time (time + frequenceRedGreen)]
+          ask patch-at road_size i[
+            if pcolor = orange[
+              set pcolor red
+            ]
+          ]
+          ask patch-at (- road_size - 1) (- road_size + i)[
+            if pcolor = orange[
+              set pcolor red
+            ]
+          ]
+          ask patch-at (- road_size + i) road_size[
+            if pcolor = orange[
+              set pcolor red
+            ]
+          ]
+          ask patch-at (i) (- road_size - 1)[
+            if pcolor = orange[
+              set pcolor red
+            ]
+          ]
+        ]
       ]
     ]
     set i (i + 1)
@@ -212,11 +303,11 @@ end
 
 to go
   ask cars[
-
     if setNextMovement[
       move
     ]
   ]
+  change-lights
   tick
 end
 
@@ -373,7 +464,7 @@ num-cars
 num-cars
 0
 400
-201
+202
 1
 1
 NIL

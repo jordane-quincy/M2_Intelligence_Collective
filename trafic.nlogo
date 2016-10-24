@@ -217,12 +217,16 @@ to setup-lights
     set i (i + 1)
   ]
 end
-
+;Permet de modifier dynamiquement la fraquence de changement des feux sur un carrefour.
+;crossroads_num: Numéro du carrefour(label du flag)
+;frequence: entre 1 et l'infini !
 to set-frequence [crossroads_num frequence]
-  ask banners[
-    if label = crossroads_num[
-      set frequenceRedGreen frequence
-      set frequenceOrange (frequenceRedGreen / 5)
+  if frequence > 0 and frequence < 500[
+    ask banners[
+      if label = crossroads_num[
+        set frequenceRedGreen frequence
+        set frequenceOrange (frequenceRedGreen / 5)
+      ]
     ]
   ]
 end

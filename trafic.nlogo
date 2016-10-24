@@ -218,6 +218,15 @@ to setup-lights
   ]
 end
 
+to set-frequence [crossroads_num frequence]
+  ask banners[
+    if label = crossroads_num[
+      set frequenceRedGreen frequence
+      set frequenceOrange (frequenceRedGreen / 5)
+    ]
+  ]
+end
+
 to change-lights
   let i 0
   let time_before_green 0 ;Pour passer au rouge ou vert selon le feu

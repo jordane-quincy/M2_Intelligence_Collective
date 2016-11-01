@@ -196,6 +196,7 @@ to setup-cars
       set patchDirection dir
     ]
     set direction patchDirection
+    set heading 45 ;
 
   ]
 end
@@ -363,8 +364,8 @@ to-report moveAhead [patchAhead]
   report moveEnabled?
 end
 
-to-report setNextMovement
-  let moveEnabled? false
+;Gestion de l'orientation et de la forme de la voiture selon sa direction
+to setHeadingAndShapeAccordingCarDirection
   if direction = 0 [set direction one-of["N" "E" "S" "O"]] ;si on est dans un carrefour, on change de direction
   if direction = "N" [
     set heading 0
@@ -382,6 +383,10 @@ to-report setNextMovement
     set heading 270
     set shape "cartowest"
   ]
+end
+
+to-report setNextMovement
+  setHeadingAndShapeAccordingCarDirection
 
   report moveAhead 1
 end

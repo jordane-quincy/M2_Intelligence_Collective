@@ -196,8 +196,10 @@ to setup-cars
       set patchDirection dir
     ]
     set direction patchDirection
-    set heading 45 ;
+    setHeadingAndShapeAccordingCarDirection
 
+    ;le conducteur desire rouler a une vitesse maximum (inferieur a la reglementation)
+    set speed-max (random-float speed-limit)
   ]
 end
 
@@ -329,7 +331,7 @@ end
 to go
   ;Gestion de chaque voiture
   ask cars[
-    if setNextMovement[
+    if canMove?[
       move
     ]
   ]
@@ -385,14 +387,14 @@ to setHeadingAndShapeAccordingCarDirection
   ]
 end
 
-to-report setNextMovement
+to-report canMove?
   setHeadingAndShapeAccordingCarDirection
 
-  report moveAhead 1
+  report moveAhead speed-max
 end
 
 to move
-  fd 1
+  forward speed-max
 end
 @#$#@#$#@
 GRAPHICS-WINDOW

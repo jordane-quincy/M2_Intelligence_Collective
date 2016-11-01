@@ -23,12 +23,12 @@ patches-own[
 
 cars-own[
   speed  ;;vitesse courante
-  speed-max  ;; vitesse désirée de l’agent
-  patience  ;;niveau de patience (dans un stop ou pour dépasser un autre agent)
+  speed-max  ;; vitesse desiree de l’agent
+  patience  ;;niveau de patience (dans un stop ou pour depasser un autre agent)
   max-patience ;; niveau de patience maximum
-  change?  ;;vraie si le véhicule veut changer de voies
-  direction  ;;la direction désirée courante (nord, sud, est, ouest)
-  wait-time  ;;le temps passé depuis son dernier déplacement
+  change?  ;;vraie si le vehicule veut changer de voies
+  direction  ;;la direction desiree courante (nord, sud, est, ouest)
+  wait-time  ;;le temps passe depuis son dernier deplacement
 ]
 banners-own[
   frequenceRedGreen ;Nombre de ticks avant passage du rouge au vert et du vert au orange.
@@ -75,7 +75,7 @@ to creerIntersection [X Y val]
     set hidden? true
   ]
 
-  ;on prends les patchs dans le carré autour du banner
+  ;on prends les patchs dans le carre autour du banner
   ask patches with [(pxcor >= Xmin and pxcor < Xmax and pycor >= Ymin and pycor < Ymax)] [
     ;set pcolor blue
     set intersection? true
@@ -94,6 +94,7 @@ to creerIntersection [X Y val]
 
 end
 
+;Initialisation des routes
 to setup-road
   let pos_x min-pxcor + 1 + floor (grid_y_inc / 2)
   let Xmin pos_x - road_size
@@ -143,6 +144,7 @@ to setup-road
   ]
 end
 
+;Initialisation globale des patchs
 to setup-patches
   ;;Initialiser tous les patchs
   ask patches [
@@ -150,7 +152,7 @@ to setup-patches
     set road? false
     set pcolor brown
   ]
-  ;;création intersection
+  ;;creation intersection
   let pos_y min-pxcor + 1 + floor (grid_x_inc / 2)
   let i 0 ;numero (ID) de l'intersection
   while [pos_y < max-pycor] [
@@ -171,10 +173,11 @@ to setup-patches
 
 end
 
+;Initialisation des voitures
 to setup-cars
   set-default-shape cars "car"
   create-cars num-cars [
-    ;set current-ticks 0
+    ;Les voitures ont une couleur aleatoire
     set color one-of [ blue red green orange violet ]
     set size 1
 
@@ -187,7 +190,7 @@ to setup-cars
     ]
     setxy xCar yCar
 
-    ;au setup, la voiture va dans la direction de la voie sur laquelle elle est dÃ©posÃ©e
+    ;au setup, la voiture va dans la direction de la voie sur laquelle elle est deposee
     let patchDirection 0
     ask patch-here [
       set patchDirection dir
@@ -197,28 +200,34 @@ to setup-cars
   ]
 end
 
+;Initialisation des feux
 to setup-lights
   let i 0
   while[i < road_size][
     ask banners[
-      ask patch-at road_size i[
-        set pcolor green
-      ]
+      ;Feu au Nord du carrefour
       ask patch-at (- road_size + i) road_size[
         set pcolor red
       ]
-      ask patch-at (- road_size - 1) (- road_size + i)[
+      ;Feu a l'Est du carrefour
+      ask patch-at road_size i[
         set pcolor green
       ]
+      ;Feu au Sud du carrefour
       ask patch-at (i) (- road_size - 1)[
         set pcolor red
+      ]
+      ;Feu a l'Ouest du carrefour
+      ask patch-at (- road_size - 1) (- road_size + i)[
+        set pcolor green
       ]
     ]
     set i (i + 1)
   ]
 end
-;Permet de modifier dynamiquement la fraquence de changement des feux sur un carrefour.
-;crossroads_num: Numéro du carrefour(label du flag)
+
+;Permet de modifier dynamiquement la frequence de changement des feux sur un carrefour.
+;crossroads_num: Numero du carrefour(label du flag)
 ;frequence: entre 1 et l'infini !
 to set-frequence [crossroads_num frequence]
   if frequence > 0 and frequence < 500[
@@ -231,6 +240,7 @@ to set-frequence [crossroads_num frequence]
   ]
 end
 
+;Gestion des feux
 to change-lights
   let i 0
   let time_before_green 0 ;Pour passer au rouge ou vert selon le feu
@@ -314,12 +324,15 @@ to change-lights
   ]
 end
 
+;Lancement (ou reprise) de la simulation
 to go
+  ;Gestion de chaque voiture
   ask cars[
     if setNextMovement[
       move
     ]
   ]
+  ;Gestion des feux
   change-lights
   tick
 end

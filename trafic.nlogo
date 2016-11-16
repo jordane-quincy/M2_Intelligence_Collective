@@ -333,6 +333,9 @@ to go
   ask cars[
     if canMove?[
       move
+
+      ;maj de la vitesse max après ce mouvement
+      set speed-max (random-float speed-limit)
     ]
   ]
   ;Gestion des feux
@@ -345,7 +348,7 @@ to-report moveAhead [patchAhead]
   let lightIsRed? false
   let carAhead? false
   let roadAhead? false
-  ask patch-ahead 1[
+  ask patch-ahead patchAhead [
     ;Si le feu(patch) est rouge on ne peut passer
     if pcolor = red[
       set lightIsRed? true
@@ -390,11 +393,11 @@ end
 to-report canMove?
   setHeadingAndShapeAccordingCarDirection
 
-  report moveAhead speed-max
+  report moveAhead (1 + speed-max)
 end
 
 to move
-  forward speed-max
+  forward (1 + speed-max)
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -512,7 +515,7 @@ speed-limit
 speed-limit
 0
 1
-0.1
+0.2
 0.1
 1
 NIL

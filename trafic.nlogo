@@ -640,7 +640,7 @@ num-cars
 num-cars
 0
 400
-168
+219
 1
 1
 NIL
@@ -685,7 +685,7 @@ deceleration
 deceleration
 0
 0.30
-0.05
+0.256
 0.001
 1
 NIL
@@ -715,6 +715,26 @@ crossroad-signal
 crossroad-signal
 "none" "signal4"
 0
+
+PLOT
+878
+10
+1331
+212
+Speeds
+time
+speed
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"min speed" 1.0 0 -13345367 true "" "plot min [speed] of cars"
+"max speed" 1.0 0 -2674135 true "" "plot max [speed] of cars"
+"avg speed" 1.0 0 -10899396 true "" "plot mean [speed] of cars"
 
 @#$#@#$#@
 ## WHAT IS IT?

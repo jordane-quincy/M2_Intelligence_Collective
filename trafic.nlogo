@@ -331,24 +331,62 @@ end
 to go
   ;Gestion de chaque voiture
   ask cars[
-    if canMove?[
+    ifelse canMove? = 0 [
       move
-
       ;maj de la vitesse max après ce mouvement
-      set speed (random-float speed-max)
+      if (speed + acceleration <= speed-max) [
+        set speed (speed + acceleration)
+      ]
     ]
+    [
+      ;On ralenti puis on move
+      ;Si l'obstacle est une voiture, on regarde sa vitesse pour savoir s'il faut freiner ou non
+      let speedCarAhead 0
+
+
+      let patchAheadInIntersection? false
+      let carAheadSameDirection? true
+      let currentDirection direction
+      ask cars-on patch-ahead canMove? [
+        set speedCarAhead speed
+        ask patch-here [
+          if intersection? [
+            set patchAheadInIntersection? true
+          ]
+        ]
+        if direction != currentDirection [
+           set carAheadSameDirection? false
+        ]
+
+      ]
+      ;On ralenti si la vitesse de la voiture de devant est plus faible que la notre
+      ;Ou si la voiture est dans un carrefour et dans une direction différente de la notre
+      if speedCarAhead < speed or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
+        ifelse (speed - (deceleration / canMove?)) >= 0 [
+        set speed (speed - (deceleration / canMove?))
+        ]
+        [
+          ;Pour ne pas avoir de match arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
+          ;Alors on set la speed à 0 sinon on aura des marches arrières
+          set speed 0
+        ]
+      ]
+
+      move
+    ]
+
   ]
   ;Gestion des feux
   change-lights
   tick
 end
 
-to-report moveAhead [distance]
+to-report moveAhead [dist]
   let moveEnabled? false
   let lightIsRed? false
   let carAhead? false
   let roadAhead? false
-  ask patch-ahead distance [
+  ask patch-ahead dist [
     ;Si le feu(patch) est rouge on ne peut passer
     if pcolor = red[
       set lightIsRed? true
@@ -357,8 +395,6 @@ to-report moveAhead [distance]
     if any? cars-here = true [
       set carAhead? true
     ]
-
-
 
     ;Si le patch devant est bien une route
     if road? = true [
@@ -393,14 +429,26 @@ to setHeadingAndShapeAccordingCarDirection
   ]
 end
 
+;On renvoie 0 si on peut bouger
+;Sinon on renvoie 1, 2, 3 ..., en fonction de où l'obstacle nous block
+;1 signifie l'obstacle est 1 patch-ahead, 2 signifie que l'obstacle est 2 patch ahead etc etc
 to-report canMove?
   setHeadingAndShapeAccordingCarDirection
-
-  report moveAhead (1 + speed)
+  let canMoveAhead? true
+  let i 1
+  let obstacleAtPatch 0
+  while [i <= ahead-vision and canMoveAhead?] [
+    if (not (moveAhead (i))) [
+      set canMoveAhead? false
+      set obstacleAtPatch i
+    ]
+    set i (i + 1)
+  ]
+  report obstacleAtPatch
 end
 
 to move
-  forward (1 + speed)
+  forward speed
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -533,7 +581,7 @@ acceleration
 acceleration
 0
 0.099
-0.0499
+0.0435
 0.0001
 1
 NIL
@@ -547,8 +595,8 @@ SLIDER
 deceleration
 deceleration
 0
-0.099
-0.075
+0.15
+0.15
 0.001
 1
 NIL
@@ -563,7 +611,7 @@ ahead-vision
 ahead-vision
 0
 3
-1
+2
 1
 1
 NIL

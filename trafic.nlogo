@@ -22,13 +22,15 @@ patches-own[
 ]
 
 cars-own[
-  speed  ;;vitesse courante
-  speed-max  ;; vitesse desiree de l’agent
-  patience  ;;niveau de patience (dans un stop ou pour depasser un autre agent)
-  max-patience ;; niveau de patience maximum
-  change?  ;;vraie si le vehicule veut changer de voies
-  direction  ;;la direction desiree courante (nord, sud, est, ouest)
-  wait-time  ;;le temps passe depuis son dernier deplacement
+  speed              ;; Vitesse courante
+  speed-max          ;; Vitesse desiree de l’agent
+  patience           ;; Niveau de patience (dans un stop ou pour depasser un autre agent)
+  max-patience       ;; Niveau de patience maximum
+  change?            ;; Vraie si le vehicule veut changer de voies
+  direction          ;; La direction desiree courante (nord, sud, est, ouest)
+  next_direction     ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
+  next_direction?    ;; Permet de savoir si la prochaine direction a été set
+  wait-time          ;; Le temps passé depuis son dernier deplacement
 ]
 banners-own[
   frequenceRedGreen ;Nombre de ticks avant passage du rouge au vert et du vert au orange.
@@ -72,7 +74,7 @@ to creerIntersection [X Y val]
   create-banners 1 [
     setxy X Y
     set label val
-    set hidden? true
+    set hidden? false
   ]
 
   ;on prends les patchs dans le carre autour du banner
@@ -196,6 +198,8 @@ to setup-cars
       set patchDirection dir
     ]
     set direction patchDirection
+    findNextDirection
+
     setHeadingAndShapeAccordingCarDirection
 
     ;le conducteur desire rouler a une vitesse maximum (inferieur a la reglementation)
@@ -255,7 +259,7 @@ to change-lights
 
   while[i < road_size][
     ask banners[
-        print(word "ticks: " ticks " time * frequenceRedGreen: " frequenceRedGreen)
+        ;print(word "ticks: " ticks " time * frequenceRedGreen: " frequenceRedGreen)
       if ticks - time = frequenceRedGreen or ticks - time = (frequenceRedGreen + frequenceOrange)[
         if ticks - time = frequenceRedGreen[
           ask patch-at road_size i[
@@ -456,7 +460,74 @@ to-report canMove?
 end
 
 to move
-  forward speed
+  let is_intersection? false
+  let new_direction direction
+  let num_intersection 0
+  let can_turn? false
+
+  ask patch-here[
+    if intersection?[
+      set is_intersection? true
+
+    ]
+  ]
+
+  ifelse not is_intersection? or not can_turn?[
+    forward (1 + speed-max)
+  ]
+  [
+    print(word "direction: " direction " next direction: " next_direction)
+
+    set direction next_direction
+    if direction = "N" [
+      set heading 0
+      set shape "cartonorth"
+    ]
+    if direction = "E" [
+      set heading 90
+      set shape "car"
+    ]
+    if direction = "S" [
+      set heading 180
+      set shape "cartosouth"
+    ]
+    if direction = "O" [
+      set heading 270
+      set shape "cartowest"
+    ]
+    fd 1
+
+    ;;Regarde si on peut modifier la prochaine direction
+    resetDirection
+  ]
+end
+
+to findNextDirection
+  if direction = "N" [
+    set next_direction one-of["N" "E" "O"]
+  ]
+  if direction = "E" [
+    set next_direction one-of["E" "S" "N"]
+  ]
+  if direction = "S" [
+    set next_direction one-of["S" "O" "E"]
+  ]
+  if direction = "O" [
+    set next_direction one-of["O" "N" "S"]
+  ]
+end
+
+to resetDirection
+  let is_intersection? false
+  ask patch-ahead -1[
+      if intersection?[
+        set is_intersection? true
+      ]
+    ]
+    if is_intersection?[
+      print(word "direction: " direction " next direction: " next_direction)
+      findNextDirection
+    ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -559,7 +630,7 @@ num-cars
 num-cars
 0
 400
-202
+1
 1
 1
 NIL

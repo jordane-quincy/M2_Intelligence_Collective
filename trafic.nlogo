@@ -368,16 +368,22 @@ to go
       ]
       ;On ralenti si la vitesse de la voiture de devant est plus faible que la notre
       ;Ou si la voiture est dans un carrefour et dans une direction différente de la notre
-      if speedCarAhead < speed or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
+      ;Ou si ma vitesse est 0 et que la voiture devant a une vitesse aussi égale à 0
+      if speedCarAhead < speed or (speed = 0 and speedCarAhead = 0) or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
         ifelse (speed - (deceleration / canMove?)) >= 0 [
           set speed (speed - (deceleration / canMove?))
         ]
         [
           ;Pour ne pas avoir de match arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
           ;Alors on set la speed à 0 sinon on aura des marches arrières
-          if canMove? = 1 [
+          ifelse canMove? = 1 [
             ;On set la speed à 0 uniquement si l'obstacle est 1 patch devant nous
             set speed 0
+          ]
+          [
+            if speed = 0 [
+              set speed (speed + deceleration)
+            ]
           ]
 
         ]
@@ -649,7 +655,7 @@ speed-limit
 speed-limit
 0
 1
-1
+0.6
 0.1
 1
 NIL
@@ -664,7 +670,7 @@ acceleration
 acceleration
 0
 0.099
-0.012
+0.0719
 0.0001
 1
 NIL
@@ -679,7 +685,7 @@ deceleration
 deceleration
 0
 0.30
-0.3
+0.05
 0.001
 1
 NIL

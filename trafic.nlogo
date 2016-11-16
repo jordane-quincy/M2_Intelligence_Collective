@@ -199,7 +199,7 @@ to setup-cars
     setHeadingAndShapeAccordingCarDirection
 
     ;le conducteur desire rouler a une vitesse maximum (inferieur a la reglementation)
-    set speed-max (random-float speed-limit)
+    set speed-max ((random-float (speed-limit - acceleration)) + acceleration)
 
     ;a l'init, le conducteur n'a pas encore attendu
     set wait-time 0
@@ -603,8 +603,8 @@ SLIDER
 deceleration
 deceleration
 0
-0.15
-0.15
+0.30
+0.3
 0.001
 1
 NIL

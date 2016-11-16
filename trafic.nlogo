@@ -370,12 +370,16 @@ to go
       ;Ou si la voiture est dans un carrefour et dans une direction différente de la notre
       if speedCarAhead < speed or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
         ifelse (speed - (deceleration / canMove?)) >= 0 [
-        set speed (speed - (deceleration / canMove?))
+          set speed (speed - (deceleration / canMove?))
         ]
         [
           ;Pour ne pas avoir de match arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
           ;Alors on set la speed à 0 sinon on aura des marches arrières
-          set speed 0
+          if canMove? = 1 [
+            ;On set la speed à 0 uniquement si l'obstacle est 1 patch devant nous
+            set speed 0
+          ]
+
         ]
       ]
 
@@ -473,7 +477,7 @@ to move
   ]
 
   ifelse not is_intersection? or not can_turn?[
-    forward (1 + speed-max)
+    forward speed
   ]
   [
     print(word "direction: " direction " next direction: " next_direction)
@@ -630,7 +634,7 @@ num-cars
 num-cars
 0
 400
-1
+168
 1
 1
 NIL
@@ -660,7 +664,7 @@ acceleration
 acceleration
 0
 0.099
-0.0435
+0.012
 0.0001
 1
 NIL

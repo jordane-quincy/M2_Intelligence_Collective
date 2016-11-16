@@ -341,8 +341,11 @@ to go
     ifelse canMove? = 0 [
       move
       ;maj de la vitesse max après ce mouvement
-      if (speed + acceleration <= speed-max) [
+      ifelse (speed + acceleration <= speed-max) [
         set speed (speed + acceleration)
+      ]
+      [
+        set speed speed-max
       ]
     ]
     [
@@ -640,7 +643,7 @@ num-cars
 num-cars
 0
 400
-168
+176
 1
 1
 NIL
@@ -685,7 +688,7 @@ deceleration
 deceleration
 0
 0.30
-0.05
+0.092
 0.001
 1
 NIL

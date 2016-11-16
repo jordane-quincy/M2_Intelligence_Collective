@@ -463,6 +463,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
+  let can_turn? false
 
   ask patch-here[
     if intersection?[
@@ -471,7 +472,7 @@ to move
     ]
   ]
 
-  ifelse not is_intersection?[
+  ifelse not is_intersection? or not can_turn?[
     forward (1 + speed-max)
   ]
   [

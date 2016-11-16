@@ -101,6 +101,7 @@ to setup-road
   let pos_x min-pxcor + 1 + floor (grid_y_inc / 2)
   let Xmin pos_x - road_size
   let Xmax pos_x + road_size
+
   while [pos_x < max-pxcor] [
      set roads patches with [pxcor >= Xmin and pxcor < Xmax and pycor <= max-pycor and pycor >= min-pycor]
      ask roads [
@@ -204,7 +205,7 @@ to setup-cars
     setHeadingAndShapeAccordingCarDirection
 
     ;le conducteur desire rouler a une vitesse maximum (inferieur a la reglementation)
-    set speed-max (random-float speed-limit)
+    set speed-max ((random-float (speed-limit - acceleration)) + acceleration)
 
     ;a l'init, le conducteur n'a pas encore attendu
     set wait-time 0
@@ -371,12 +372,16 @@ to go
       ;Ou si la voiture est dans un carrefour et dans une direction différente de la notre
       if speedCarAhead < speed or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
         ifelse (speed - (deceleration / canMove?)) >= 0 [
-        set speed (speed - (deceleration / canMove?))
+          set speed (speed - (deceleration / canMove?))
         ]
         [
           ;Pour ne pas avoir de match arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
           ;Alors on set la speed à 0 sinon on aura des marches arrières
-          set speed 0
+          if canMove? = 1 [
+            ;On set la speed à 0 uniquement si l'obstacle est 1 patch devant nous
+            set speed 0
+          ]
+
         ]
       ]
 
@@ -423,7 +428,7 @@ end
 
 ;Gestion de l'orientation et de la forme de la voiture selon sa direction
 to setHeadingAndShapeAccordingCarDirection
-  if direction = 0 [set direction one-of["N" "E" "S" "O"]] ;si on est dans un carrefour, on change de direction
+  ;if direction = 0 [set direction one-of["N" "E" "S" "O"]] ;si on est dans un carrefour, on change de direction
   if direction = "N" [
     set heading 0
     set shape "cartonorth"
@@ -464,7 +469,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? true
+  let can_turn? false
 
   ask patch-here[
     if intersection?[
@@ -474,36 +479,21 @@ to move
   ]
 
   ifelse not is_intersection? or not can_turn?[
-    forward (1 + speed-max)
+    forward speed
   ]
   [
-    print(word "direction: " direction " next direction: " next_direction)
-    if num_intersection_ = 0[
-
-    ]
-
+    ;;;;;;;;;;;;;;;;;;
+    ;Récupère le numéro de l'intersection actuelle
+    set num_intersection getNumIntersection pxcor pycor
+    print(word "num_intersection: " num_intersection)
+    ;;;;;;;;;;;;;;;;;;
 
     set direction next_direction
-    if direction = "N" [
-      set heading 0
-      set shape "cartonorth"
-    ]
-    if direction = "E" [
-      set heading 90
-      set shape "car"
-    ]
-    if direction = "S" [
-      set heading 180
-      set shape "cartosouth"
-    ]
-    if direction = "O" [
-      set heading 270
-      set shape "cartowest"
-    ]
-    fd 1
+    setHeadingAndShapeAccordingCarDirection
+    forward speed
 
     ;;Regarde si on peut modifier la prochaine direction
-    resetDirection
+    ;resetDirection
   ]
 end
 
@@ -533,6 +523,23 @@ to resetDirection
       print(word "direction: " direction " next direction: " next_direction)
       findNextDirection
     ]
+end
+
+to-report getNumIntersection [car-posx car-posy]
+  let num 0
+  let car_in_intersection? false
+
+  ask banners[
+    ask intersections[
+      if pxcor = car-posx and pycor = car-posy[
+        set car_in_intersection? true
+      ]
+    ]
+    if car_in_intersection?[
+      set num label
+    ]
+  ]
+  report num
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -635,7 +642,7 @@ num-cars
 num-cars
 0
 400
-161
+168
 1
 1
 NIL
@@ -665,7 +672,7 @@ acceleration
 acceleration
 0
 0.099
-0.0435
+0.012
 0.0001
 1
 NIL
@@ -679,8 +686,8 @@ SLIDER
 deceleration
 deceleration
 0
-0.15
-0.15
+0.30
+0.3
 0.001
 1
 NIL

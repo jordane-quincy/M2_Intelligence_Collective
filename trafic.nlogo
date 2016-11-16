@@ -200,6 +200,9 @@ to setup-cars
 
     ;le conducteur desire rouler a une vitesse maximum (inferieur a la reglementation)
     set speed-max (random-float speed-limit)
+
+    ;a l'init, le conducteur n'a pas encore attendu
+    set wait-time 0
   ]
 end
 
@@ -403,6 +406,11 @@ to-report moveAhead [dist]
   ]
   if lightIsRed? = false and carAhead? = false and roadAhead? = true[
     set moveEnabled? true
+  ]
+
+  if carAhead? [
+    ;on attend derriere un autre conducteur
+    set wait-time (wait-time + 1)
   ]
 
   report moveEnabled?

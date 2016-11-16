@@ -343,12 +343,12 @@ to go
   tick
 end
 
-to-report moveAhead [patchAhead]
+to-report moveAhead [distance]
   let moveEnabled? false
   let lightIsRed? false
   let carAhead? false
   let roadAhead? false
-  ask patch-ahead patchAhead [
+  ask patch-ahead distance [
     ;Si le feu(patch) est rouge on ne peut passer
     if pcolor = red[
       set lightIsRed? true
@@ -357,6 +357,9 @@ to-report moveAhead [patchAhead]
     if any? cars-here = true [
       set carAhead? true
     ]
+
+
+
     ;Si le patch devant est bien une route
     if road? = true [
       set roadAhead? true

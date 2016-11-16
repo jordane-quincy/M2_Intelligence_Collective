@@ -518,7 +518,6 @@ end
 
 to resetDirection
   let is_intersection? false
-  set
   ask patch-ahead -1[
       if intersection?[
         set is_intersection? true

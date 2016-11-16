@@ -29,7 +29,7 @@ cars-own[
   change?            ;; Vraie si le vehicule veut changer de voies
   direction          ;; La direction desiree courante (nord, sud, est, ouest)
   next_direction     ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
-  next_direction?    ;; Permet de savoir si la prochaine direction a été set
+  num_intersection_  ;; Permet de savoir si on peut set la prochaine direction
   wait-time          ;; Le temps passé depuis son dernier deplacement
 ]
 banners-own[
@@ -199,6 +199,7 @@ to setup-cars
     ]
     set direction patchDirection
     findNextDirection
+    set num_intersection_ 0
 
     setHeadingAndShapeAccordingCarDirection
 
@@ -463,7 +464,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? false
+  let can_turn? true
 
   ask patch-here[
     if intersection?[
@@ -477,6 +478,10 @@ to move
   ]
   [
     print(word "direction: " direction " next direction: " next_direction)
+    if num_intersection_ = 0[
+
+    ]
+
 
     set direction next_direction
     if direction = "N" [
@@ -630,7 +635,7 @@ num-cars
 num-cars
 0
 400
-1
+161
 1
 1
 NIL

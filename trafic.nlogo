@@ -335,7 +335,7 @@ to go
       move
 
       ;maj de la vitesse max après ce mouvement
-      set speed-max (random-float speed-limit)
+      set speed (random-float speed-max)
     ]
   ]
   ;Gestion des feux
@@ -393,11 +393,11 @@ end
 to-report canMove?
   setHeadingAndShapeAccordingCarDirection
 
-  report moveAhead (1 + speed-max)
+  report moveAhead (1 + speed)
 end
 
 to move
-  forward (1 + speed-max)
+  forward (1 + speed)
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -421,8 +421,8 @@ GRAPHICS-WINDOW
 40
 -40
 40
-1
-1
+0
+0
 1
 ticks
 30.0
@@ -515,7 +515,7 @@ speed-limit
 speed-limit
 0
 1
-0.2
+1
 0.1
 1
 NIL

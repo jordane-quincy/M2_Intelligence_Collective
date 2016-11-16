@@ -54,7 +54,13 @@ end
 
 to setup_globals
   set grid_x_inc floor(world-height / grid_x )
-  set grid_y_inc floor(world-width / grid_y)
+  ifelse grid_y = 0 [
+    set grid_y_inc world-width * 2
+  ]
+  [
+    set grid_y_inc floor(world-width / grid_y)
+  ]
+
 end
 
 to setup-banners
@@ -343,8 +349,11 @@ to go
     ifelse canMove? = 0 [
       move
       ;maj de la vitesse max après ce mouvement
-      if (speed + acceleration <= speed-max) [
+      ifelse (speed + acceleration <= speed-max) [
         set speed (speed + acceleration)
+      ]
+      [
+        set speed speed-max
       ]
     ]
     [
@@ -370,16 +379,22 @@ to go
       ]
       ;On ralenti si la vitesse de la voiture de devant est plus faible que la notre
       ;Ou si la voiture est dans un carrefour et dans une direction différente de la notre
-      if speedCarAhead < speed or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
+      ;Ou si ma vitesse est 0 et que la voiture devant a une vitesse aussi égale à 0
+      if speedCarAhead < speed or (speed = 0 and speedCarAhead = 0) or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
         ifelse (speed - (deceleration / canMove?)) >= 0 [
           set speed (speed - (deceleration / canMove?))
         ]
         [
           ;Pour ne pas avoir de match arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
           ;Alors on set la speed à 0 sinon on aura des marches arrières
-          if canMove? = 1 [
+          ifelse canMove? = 1 [
             ;On set la speed à 0 uniquement si l'obstacle est 1 patch devant nous
             set speed 0
+          ]
+          [
+            if speed = 0 [
+              set speed (speed + deceleration)
+            ]
           ]
 
         ]
@@ -642,7 +657,7 @@ num-cars
 num-cars
 0
 400
-168
+84
 1
 1
 NIL
@@ -672,7 +687,7 @@ acceleration
 acceleration
 0
 0.099
-0.012
+0.0719
 0.0001
 1
 NIL
@@ -687,7 +702,7 @@ deceleration
 deceleration
 0
 0.30
-0.3
+0.256
 0.001
 1
 NIL
@@ -717,6 +732,26 @@ crossroad-signal
 crossroad-signal
 "none" "signal4"
 0
+
+PLOT
+878
+10
+1331
+212
+Speeds
+time
+speed
+0.0
+10.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"min speed" 1.0 0 -13345367 true "" "plot min [speed] of cars"
+"max speed" 1.0 0 -2674135 true "" "plot max [speed] of cars"
+"avg speed" 1.0 0 -10899396 true "" "plot mean [speed] of cars"
 
 @#$#@#$#@
 ## WHAT IS IT?

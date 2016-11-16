@@ -54,7 +54,13 @@ end
 
 to setup_globals
   set grid_x_inc floor(world-height / grid_x )
-  set grid_y_inc floor(world-width / grid_y)
+  ifelse grid_y = 0 [
+    set grid_y_inc world-width * 2
+  ]
+  [
+    set grid_y_inc floor(world-width / grid_y)
+  ]
+
 end
 
 to setup-banners
@@ -643,7 +649,7 @@ num-cars
 num-cars
 0
 400
-219
+84
 1
 1
 NIL
@@ -658,7 +664,7 @@ speed-limit
 speed-limit
 0
 1
-0.6
+1
 0.1
 1
 NIL

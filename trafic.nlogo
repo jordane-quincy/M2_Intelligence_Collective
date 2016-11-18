@@ -169,7 +169,7 @@ to setup-patches
     let pos_x min-pycor + 1 + floor (grid_y_inc / 2)
     while [pos_x < max-pxcor] [
       set i (i + 1)
-      creerIntersection pos_x pos_y (i + 1)
+      creerIntersection pos_x pos_y i
       set pos_x pos_x + grid_y_inc
     ]
     set pos_y pos_y + grid_x_inc
@@ -660,21 +660,19 @@ to resetDirection
 
 end
 
+;Retourne le numero de l'intersection ou se trouve la voiture
 to-report getNumIntersection [car-posx car-posy]
   let num 0
-  let num_found? false
 
-  ask banners[
-    if not num_found?[
-        set num label
-        print(word "LABEL: "num)
-        ask intersections[
-          if pxcor = car-posx and pycor = car-posy[
-            set num_found? true
-          ]
-      ]
-    ]
+  let xMin (car-posx - road_size)
+  let xMax (car-posx + road_size)
+  let yMin (car-posy - road_size)
+  let yMax (car-posy + road_size)
+  ask banners-on intersections with [(pxcor >= xMin and pxcor <= xMax) and (pycor >= yMin and pycor <= yMax)] [
+     set num label
   ]
+
+  print(word "LABEL: "num)
   report num
 end
 

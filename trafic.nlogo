@@ -169,7 +169,7 @@ to setup-patches
     let pos_x min-pycor + 1 + floor (grid_y_inc / 2)
     while [pos_x < max-pxcor] [
       set i (i + 1)
-      creerIntersection pos_x pos_y (i + 1)
+      creerIntersection pos_x pos_y i
       set pos_x pos_x + grid_y_inc
     ]
     set pos_y pos_y + grid_x_inc

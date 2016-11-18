@@ -169,7 +169,7 @@ to setup-patches
     let pos_x min-pycor + 1 + floor (grid_y_inc / 2)
     while [pos_x < max-pxcor] [
       set i (i + 1)
-      creerIntersection pos_x pos_y i
+      creerIntersection pos_x pos_y (i + 1)
       set pos_x pos_x + grid_y_inc
     ]
     set pos_y pos_y + grid_x_inc
@@ -486,7 +486,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? false
+  let can_turn? true
   let can_change_lane? false
   let lane_where_to_move 0
 
@@ -514,13 +514,13 @@ to move
   [
     ;;;;;;;;;;;;;;;;;;
     ;Récupère le numéro de l'intersection actuelle
+    ;print(word "intersections 1: " num_intersection " " num_intersection_)
     set num_intersection getNumIntersection pxcor pycor
+
+    ;Donne la prochaine direction pour la prochaine intersection
     set direction next_direction_
-    print(word "intersections: " num_intersection " " num_intersection_)
-    if num_intersection != num_intersection_[
-      findNextDirection
-      set num_intersection_ num_intersection
-    ]
+    ;if num_intersection
+    ;print(word "intersections 2: " num_intersection " " num_intersection_)
     setHeadingAndShapeAccordingCarDirection
     forward speed
 
@@ -550,30 +550,22 @@ to findNextDirection
 end
 
 to resetDirection
-  let is_intersection? false
-  ask patch-ahead -1[
-      if intersection?[
-        set is_intersection? true
-      ]
-    ]
-    if is_intersection?[
-      ;print(word "direction: " direction " next direction: " next_direction_)
-      findNextDirection
-    ]
+
 end
 
 to-report getNumIntersection [car-posx car-posy]
   let num 0
-  let car_in_intersection? false
+  let num_found? false
 
   ask banners[
-    ask intersections[
-      if pxcor = car-posx and pycor = car-posy[
-        set car_in_intersection? true
+    if not num_found?[
+        set num label
+        print(word "LABEL: "num)
+        ask intersections[
+          if pxcor = car-posx and pycor = car-posy[
+            set num_found? true
+          ]
       ]
-    ]
-    if car_in_intersection?[
-      set num label
     ]
   ]
   report num

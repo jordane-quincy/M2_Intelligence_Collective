@@ -583,7 +583,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? false
+  let can_turn? true
   let can_change_lane? false
   let lane_where_to_move 0
 
@@ -970,7 +970,7 @@ INPUTBOX
 1048
 295
 nbrCarChangeDirectionDueToPatience
-48
+0
 1
 0
 Number

@@ -658,10 +658,15 @@ to resetDirection
 
 end
 
+;Retourne le numero de l'intersection ou se trouve la voiture
 to-report getNumIntersection [car-posx car-posy]
   let num 0
 
-  ask banners-on intersections with [(pxcor >= car-posx and pxcor <= car-posx) and (pycor >= car-posy and pycor <= car-posy)] [
+  let xMin (car-posx - road_size)
+  let xMax (car-posx + road_size)
+  let yMin (car-posy - road_size)
+  let yMax (car-posy + road_size)
+  ask banners-on intersections with [(pxcor >= xMin and pxcor <= xMax) and (pycor >= yMin and pycor <= yMax)] [
      set num label
   ]
 
@@ -835,7 +840,7 @@ num-cars
 num-cars
 0
 400
-166
+1
 1
 1
 NIL

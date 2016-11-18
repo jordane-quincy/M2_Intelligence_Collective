@@ -667,8 +667,6 @@ to-report getNumIntersection [car-posx car-posy]
   ask banners-on intersections with [(pxcor >= xMin and pxcor <= xMax) and (pycor >= yMin and pycor <= yMax)] [
      set num label
   ]
-
-  print(word "LABEL: "num)
   report num
 end
 

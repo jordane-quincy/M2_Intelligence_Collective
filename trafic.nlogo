@@ -486,7 +486,8 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? true
+  let can_turn? false
+  let can_change_lane? false
   let lane_where_to_move 0
 
   ask patch-here[
@@ -496,13 +497,18 @@ to move
   ]
 
   ifelse not is_intersection? or not can_turn?[
-    set lane_where_to_move checkNeedChangingLane
-    ifelse lane_where_to_move > 0[
-      ;print(word "Changement de voie")
-      changingLane lane_where_to_move
+    ifelse can_change_lane?[
+      set lane_where_to_move checkNeedChangingLane
+      ifelse lane_where_to_move > 0[
+        ;print(word "Changement de voie")
+        changingLane lane_where_to_move
+      ]
+      [
+        forward speed
+      ]
     ]
     [
-      forward speed
+       forward speed
     ]
   ]
   [

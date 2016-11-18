@@ -26,7 +26,7 @@ cars-own[
   speed              ;; Vitesse courante
   speed-max          ;; Vitesse desiree de l’agent
   patience           ;; Niveau de patience (dans un stop ou pour depasser un autre agent)
-  max-patience       ;; Niveau de patience maximum
+  cptAvancement      ;; Permet de compter le nbr de fois qu'on avance sans s'arrêter
   change?            ;; Vraie si le vehicule veut changer de voies
   direction          ;; La direction desiree courante (nord, sud, est, ouest)
   next_direction_    ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
@@ -215,6 +215,17 @@ to setup-cars
     ;le conducteur desire rouler a une vitesse maximum (inferieur a la reglementation)
     set speed-max ((random-float (speed-limit - acceleration)) + acceleration)
 
+    ;on set la patience de l'agent (random avec le patience-max
+    ;On inverse les patiences min et max si besoin (pb de paramétrage)
+    if patience-min > patience-max [
+      let patience-min-tmp patience-min
+      set patience-min patience-max
+      set patience-max patience-min-tmp
+    ]
+    set patience ((random-float (patience-max - patience-min)) + patience-min)
+
+    set cptAvancement 0
+
     ;a l'init, le conducteur n'a pas encore attendu
     set wait-time 0
   ]
@@ -259,6 +270,24 @@ to set-frequence [crossroads_num frequence]
     ]
   ]
 end
+
+;On récupère la direction avec l'angle du heading qu'on passe en paramètre
+to-report getDirectionWithHeading [headingRate]
+  if headingRate = 0 [
+    report "N"
+  ]
+  if headingRate = 90 [
+    report "E"
+  ]
+  if headingRate = 180 [
+    report "S"
+  ]
+  if headingRate = 270 [
+    report "O"
+  ]
+
+end
+
 
 ;Gestion des feux
 to change-lights
@@ -362,8 +391,6 @@ to go
       ;On ralenti puis on move
       ;Si l'obstacle est une voiture, on regarde sa vitesse pour savoir s'il faut freiner ou non
       let speedCarAhead 0
-
-
       let patchAheadInIntersection? false
       let carAheadSameDirection? true
       let currentDirection direction
@@ -377,29 +404,81 @@ to go
         if direction != currentDirection [
            set carAheadSameDirection? false
         ]
-
       ]
+
+      let currentCarInInteresection? false
+      ask patch-here [
+        set currentCarInInteresection? intersection?
+      ]
+
       ;On ralenti si la vitesse de la voiture de devant est plus faible que la notre
       ;Ou si la voiture est dans un carrefour et dans une direction différente de la notre
       ;Ou si ma vitesse est 0 et que la voiture devant a une vitesse aussi égale à 0
       if speedCarAhead < speed or (speed = 0 and speedCarAhead = 0) or (not (carAheadSameDirection?) and patchAheadInIntersection?) [
-        ifelse (speed - (deceleration / canMove?)) >= 0 [
-          set speed (speed - (deceleration / canMove?))
-        ]
-        [
-          ;Pour ne pas avoir de match arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
-          ;Alors on set la speed à 0 sinon on aura des marches arrières
-          ifelse canMove? = 1 [
-            ;On set la speed à 0 uniquement si l'obstacle est 1 patch devant nous
-            set speed 0
+        ifelse patchAheadInIntersection? and currentCarInInteresection? [
+          ifelse (speed - deceleration) >= 0 [
+            set speed (speed - deceleration)
           ]
           [
-            if speed = 0 [
-              set speed (speed + deceleration)
+            ;Pour ne pas avoir de marche arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
+            ;Alors on set la speed à 0 sinon on aura des marches arrières
+            ifelse (canMove? = 1 or (patchAheadInIntersection? and not currentCarInInteresection?)) [
+              ;On set la speed à 0 uniquement si l'obstacle est 1 patch devant nous ou si l'obstacle est dans une intersection
+              set speed 0
+            ]
+            [
+              if speed = 0 [
+                set speed (speed + deceleration)
+              ]
             ]
           ]
-
         ]
+        [
+          ifelse (speed - (deceleration / canMove?)) >= 0 [
+
+            set speed (speed - (deceleration / canMove?))
+          ]
+          [
+            ;Pour ne pas avoir de marche arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
+            ;Alors on set la speed à 0 sinon on aura des marches arrières
+            ifelse canMove? = 1 [
+              ;On set la speed à 0 uniquement si l'obstacle est 1 patch devant nous
+              set speed 0
+            ]
+            [
+              if speed = 0 [
+                set speed (speed + deceleration)
+              ]
+            ]
+
+          ]
+        ]
+
+      ]
+
+      ;Si on est à l'arret depuis très longtemps dans une intersection
+      ;On essaye d'aller à notre droite pour sortir du bouchon
+      if speed = 0 and currentCarInInteresection? and wait-time > patience [
+         ;On regarde si la voie est libre et si elle est dans la bonne direction pour nous
+         let nextOrientation nextHeading (direction)
+         let canGoNextOrientationCar? false
+         let canGoNextOrientationDir? false
+         ;il faut regarder sur le patch à 1 case de nous s'il y a une voiture ou pas
+         ask patch-at-heading-and-distance nextOrientation 1 [
+            if not (any? cars-here) [
+              set canGoNextOrientationCar? true
+            ]
+         ]
+         ;et il faut regarder si le patch à road_size de nous va bien dans la direction qu'on voudrait prendre
+         ask patch-at-heading-and-distance nextOrientation road_size [
+            if getDirectionWithHeading (nextOrientation) = dir [
+              set canGoNextOrientationDir? true
+            ]
+         ]
+         if canGoNextOrientationCar? and canGoNextOrientationDir? [
+           print (word "la turtle " who " a changé de direction (de " direction " à " getDirectionWithHeading (nextOrientation) ") parcequ'elle a attendu trop longtemps")
+           set direction (getDirectionWithHeading (nextOrientation))
+         ]
       ]
 
       move
@@ -464,6 +543,22 @@ to setHeadingAndShapeAccordingCarDirection
   ]
 end
 
+;Récupération de la direction à prendre si on est totalement bloqué dans une intersection (en fonction de la direction qu'on a)
+to-report nextHeading [currentDir]
+  if currentDir = "N" [
+    report 90
+  ]
+  if currentDir = "E" [
+    report 180
+  ]
+  if currentDir = "S" [
+    report 270
+  ]
+  if currentDir = "O" [
+    report 0
+  ]
+end
+
 ;On renvoie 0 si on peut bouger
 ;Sinon on renvoie 1, 2, 3 ..., en fonction de où l'obstacle nous block
 ;1 signifie l'obstacle est 1 patch-ahead, 2 signifie que l'obstacle est 2 patch ahead etc etc
@@ -490,6 +585,16 @@ to move
   let can_change_lane? false
   let lane_where_to_move 0
 
+  ;reset du wait time si speed > 0 et qu'on avance au moins 4 fois de suite
+  if speed = 0 [
+    set cptAvancement 0
+  ]
+  if speed > 0 [
+    set cptAvancement (cptAvancement + 1)
+    if cptAvancement >= 4 [
+      set wait-time 0
+    ]
+  ]
   ask patch-here[
     if intersection?[
       set is_intersection? true
@@ -745,7 +850,7 @@ num-cars
 num-cars
 0
 400
-1
+166
 1
 1
 NIL
@@ -840,6 +945,36 @@ PENS
 "min speed" 1.0 0 -13345367 true "" "plot min [speed] of cars"
 "max speed" 1.0 0 -2674135 true "" "plot max [speed] of cars"
 "avg speed" 1.0 0 -10899396 true "" "plot mean [speed] of cars"
+
+SLIDER
+15
+508
+187
+541
+patience-max
+patience-max
+0
+5000
+3000
+100
+1
+NIL
+HORIZONTAL
+
+SLIDER
+18
+555
+190
+588
+patience-min
+patience-min
+2000
+3000
+2800
+100
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

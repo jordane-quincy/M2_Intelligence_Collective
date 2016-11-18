@@ -185,6 +185,7 @@ end
 
 ;Initialisation des voitures
 to setup-cars
+  set nbrCarChangeDirectionDueToPatience 0
   let value 0
   set-default-shape cars "car"
   create-cars num-cars [
@@ -477,6 +478,7 @@ to go
          ]
          if canGoNextOrientationCar? and canGoNextOrientationDir? [
            print (word "la turtle " who " a changé de direction (de " direction " à " getDirectionWithHeading (nextOrientation) ") parcequ'elle a attendu trop longtemps")
+           set nbrCarChangeDirectionDueToPatience nbrCarChangeDirectionDueToPatience + 1
            set direction (getDirectionWithHeading (nextOrientation))
          ]
       ]
@@ -581,7 +583,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? true
+  let can_turn? false
   let can_change_lane? false
   let lane_where_to_move 0
 
@@ -591,7 +593,7 @@ to move
   ]
   if speed > 0 [
     set cptAvancement (cptAvancement + 1)
-    if cptAvancement >= 4 [
+    if cptAvancement >= 10 [
       set wait-time 0
     ]
   ]
@@ -836,7 +838,7 @@ num-cars
 num-cars
 0
 400
-10
+380
 1
 1
 NIL
@@ -866,7 +868,7 @@ acceleration
 acceleration
 0
 0.099
-0.0721
+0.0845
 0.0001
 1
 NIL
@@ -941,26 +943,55 @@ patience-max
 patience-max
 0
 5000
-3000
+2800
 100
 1
 NIL
 HORIZONTAL
 
 SLIDER
-18
-555
-190
-588
+15
+549
+187
+582
 patience-min
 patience-min
-2000
-3000
-2800
+0
+5000
+1700
 100
 1
 NIL
 HORIZONTAL
+
+INPUTBOX
+893
+235
+1048
+295
+nbrCarChangeDirectionDueToPatience
+48
+1
+0
+Number
+
+PLOT
+885
+313
+1328
+513
+Voiture change direction
+time
+nbrOfCar
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"nbrChangeDir" 1.0 0 -16777216 true "" "plot nbrCarChangeDirectionDueToPatience"
 
 @#$#@#$#@
 ## WHAT IS IT?

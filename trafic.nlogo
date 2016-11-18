@@ -13,12 +13,15 @@ globals[
   intersections
   roads
   sidewayColor
+  nbrCarChangeDirectionDueToPatience
+  nbrAccidents
 ]
 
 patches-own[
   intersection?     ;; booleen a vrai si le patch est dans un carrefour
   road?             ;; boolean a vrai si le patch est sur la route.
   dir ;; "N", "E", etc.
+  accidentCounted
   ;;TODO : cf modele librairy pour les accidents
 ]
 
@@ -32,6 +35,7 @@ cars-own[
   next_direction_    ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
   num_intersection_  ;; Permet de savoir si on peut set la prochaine direction
   wait-time          ;; Le temps passé depuis son dernier deplacement
+  isInitialising?    ;; La voiture est en train d'être initialisé (true tant que la voiture n'est pas toute seule sur un patch, false sinon)
 ]
 banners-own[
   frequenceRedGreen ;Nombre de ticks avant passage du rouge au vert et du vert au orange.
@@ -161,6 +165,7 @@ to setup-patches
     set intersection? false
     set road? false
     set pcolor sidewayColor
+    set accidentCounted false
   ]
   ;;creation intersection
   let pos_y min-pxcor + 1 + floor (grid_x_inc / 2)
@@ -186,13 +191,14 @@ end
 ;Initialisation des voitures
 to setup-cars
   set nbrCarChangeDirectionDueToPatience 0
+  set nbrAccidents 0
   let value 0
   set-default-shape cars "car"
   create-cars num-cars [
     ;Les voitures ont une couleur aleatoire
     set color one-of [ blue red green orange violet ]
     set size 1
-
+    set isInitialising? true
     let xCar 0
     let yCar 0
     ;on place les voitures sur les extremites des routes
@@ -378,6 +384,18 @@ end
 to go
   ;Gestion de chaque voiture
   ask cars[
+    ;;Check si la voiture n'est plus en initialisation
+    if isInitialising? [
+      let carIsInitialising? true
+      ask patch-here [
+        if count cars-here = 1 [
+          set carIsInitialising? false
+        ]
+      ]
+      set isInitialising? carIsInitialising?
+    ]
+
+
     ifelse canMove? = 0 [
       move
       ;maj de la vitesse max après ce mouvement
@@ -435,9 +453,9 @@ to go
           ]
         ]
         [
-          ifelse (speed - (deceleration / canMove?)) >= 0 [
+          ifelse (speed - (deceleration / (canMove? / ahead-vision))) >= 0 [
 
-            set speed (speed - (deceleration / canMove?))
+            set speed (speed - (deceleration / (canMove? / ahead-vision)))
           ]
           [
             ;Pour ne pas avoir de marche arrière, si on fait le calcul de la décélération et qu'on a un chiffre inférieur à 0
@@ -485,8 +503,25 @@ to go
 
       move
     ]
-
   ]
+  ;comptage nbr accidents
+    ask patches [
+      ifelse (count cars-here > 1) and (not accidentCounted) [
+        let accidentHasToBeCounted? true
+        ask cars-here [
+          if isInitialising? [
+            set accidentHasToBeCounted? false
+          ]
+        ]
+        if accidentHasToBeCounted? [
+          set accidentCounted true
+          set nbrAccidents nbrAccidents + 1
+        ]
+      ]
+      [
+        set accidentCounted false
+      ]
+    ]
   ;Gestion des feux
   change-lights
   tick
@@ -886,8 +921,8 @@ SLIDER
 deceleration
 deceleration
 0
-0.30
-0.256
+0.8
+0.311
 0.001
 1
 NIL
@@ -968,17 +1003,6 @@ patience-min
 NIL
 HORIZONTAL
 
-INPUTBOX
-893
-235
-1048
-295
-nbrCarChangeDirectionDueToPatience
-48
-1
-0
-Number
-
 PLOT
 885
 313
@@ -996,6 +1020,28 @@ true
 "" ""
 PENS
 "nbrChangeDir" 1.0 0 -16777216 true "" "plot nbrCarChangeDirectionDueToPatience"
+
+MONITOR
+895
+233
+1057
+278
+nbrVoitureChangeDirection
+nbrCarChangeDirectionDueToPatience
+17
+1
+11
+
+MONITOR
+1070
+233
+1155
+278
+NIL
+nbrAccidents
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?

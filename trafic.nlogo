@@ -555,19 +555,12 @@ end
 
 to-report getNumIntersection [car-posx car-posy]
   let num 0
-  let num_found? false
 
-  ask banners[
-    if not num_found?[
-        set num label
-        print(word "LABEL: "num)
-        ask intersections[
-          if pxcor = car-posx and pycor = car-posy[
-            set num_found? true
-          ]
-      ]
-    ]
+  ask banners-on intersections with [(pxcor >= car-posx and pxcor <= car-posx) and (pycor >= car-posy and pycor <= car-posy)] [
+     set num label
   ]
+
+  print(word "LABEL: "num)
   report num
 end
 

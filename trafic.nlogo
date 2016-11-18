@@ -12,6 +12,7 @@ globals[
   grid_y_inc
   intersections
   roads
+  sidewayColor
 ]
 
 patches-own[
@@ -28,7 +29,7 @@ cars-own[
   max-patience       ;; Niveau de patience maximum
   change?            ;; Vraie si le vehicule veut changer de voies
   direction          ;; La direction desiree courante (nord, sud, est, ouest)
-  next_direction     ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
+  next_direction_    ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
   num_intersection_  ;; Permet de savoir si on peut set la prochaine direction
   wait-time          ;; Le temps passé depuis son dernier deplacement
 ]
@@ -60,7 +61,7 @@ to setup_globals
   [
     set grid_y_inc floor(world-width / grid_y)
   ]
-
+  set sidewayColor brown
 end
 
 to setup-banners
@@ -159,7 +160,7 @@ to setup-patches
   ask patches [
     set intersection? false
     set road? false
-    set pcolor brown
+    set pcolor sidewayColor
   ]
   ;;creation intersection
   let pos_y min-pxcor + 1 + floor (grid_x_inc / 2)
@@ -184,6 +185,7 @@ end
 
 ;Initialisation des voitures
 to setup-cars
+  let value 0
   set-default-shape cars "car"
   create-cars num-cars [
     ;Les voitures ont une couleur aleatoire
@@ -485,16 +487,23 @@ to move
   let new_direction direction
   let num_intersection 0
   let can_turn? false
+  let lane_where_to_move 0
 
   ask patch-here[
     if intersection?[
       set is_intersection? true
-
     ]
   ]
 
   ifelse not is_intersection? or not can_turn?[
-    forward speed
+
+    ifelse lane_where_to_move = checkNeedChangingLane[
+      print(word "Changement de voie")
+      changingLane lane_where_to_move
+    ]
+    [
+      forward speed
+    ]
   ]
   [
     ;;;;;;;;;;;;;;;;;;
@@ -503,7 +512,7 @@ to move
     print(word "num_intersection: " num_intersection)
     ;;;;;;;;;;;;;;;;;;
 
-    set direction next_direction
+    set direction next_direction_
     setHeadingAndShapeAccordingCarDirection
     forward speed
 
@@ -514,16 +523,16 @@ end
 
 to findNextDirection
   if direction = "N" [
-    set next_direction one-of["N" "E" "O"]
+    set next_direction_ one-of["N" "E" "O"]
   ]
   if direction = "E" [
-    set next_direction one-of["E" "S" "N"]
+    set next_direction_ one-of["E" "S" "N"]
   ]
   if direction = "S" [
-    set next_direction one-of["S" "O" "E"]
+    set next_direction_ one-of["S" "O" "E"]
   ]
   if direction = "O" [
-    set next_direction one-of["O" "N" "S"]
+    set next_direction_ one-of["O" "N" "S"]
   ]
 end
 
@@ -535,7 +544,7 @@ to resetDirection
       ]
     ]
     if is_intersection?[
-      print(word "direction: " direction " next direction: " next_direction)
+      print(word "direction: " direction " next direction: " next_direction_)
       findNextDirection
     ]
 end
@@ -555,6 +564,53 @@ to-report getNumIntersection [car-posx car-posy]
     ]
   ]
   report num
+end
+
+;;Fonction qui permet si besoin quelle est la voie sur laquelle doit se déplacer la voiture(0 si aucun déplacement, sinon > 0)
+to-report checkNeedChangingLane
+  let next_direction ""
+  let lane getLane
+  let lane_where_to_move 0
+
+  if direction = "N" [
+    if next_direction_ = "E" and lane != 1[
+
+    ]
+  ]
+  if direction = "E" [
+    set next_direction_ one-of["E" "S" "N"]
+  ]
+  if direction = "S" [
+    set next_direction_ one-of["S" "O" "E"]
+  ]
+  if direction = "O" [
+    set next_direction_ one-of["O" "N" "S"]
+  ]
+
+
+  report lane_where_to_move
+end
+;;Fonction qui permet de deplacer la voiture vers la voie numéro lane
+to changingLane [lane]
+  print(word "Vers voie " lane)
+end
+
+to-report getLane
+  let num_lane 1
+  let lane_found? false
+
+  set heading (heading + 90)
+  while [num_lane <= road_size and not lane_found?][
+    ask patch-ahead num_lane[
+      if pcolor = sidewayColor[
+        set lane_found? true
+      ]
+    ]
+    set num_lane (num_lane + 1)
+  ]
+  set heading (heading - 90)
+
+  report num_lane - 1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -657,7 +713,7 @@ num-cars
 num-cars
 0
 400
-84
+1
 1
 1
 NIL
@@ -687,7 +743,7 @@ acceleration
 acceleration
 0
 0.099
-0.0719
+0.0721
 0.0001
 1
 NIL

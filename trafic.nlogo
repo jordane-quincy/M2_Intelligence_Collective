@@ -486,7 +486,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? false
+  let can_turn? true
   let lane_where_to_move 0
 
   ask patch-here[
@@ -496,9 +496,9 @@ to move
   ]
 
   ifelse not is_intersection? or not can_turn?[
-
-    ifelse lane_where_to_move = checkNeedChangingLane[
-      print(word "Changement de voie")
+    set lane_where_to_move checkNeedChangingLane
+    ifelse lane_where_to_move > 0[
+      ;print(word "Changement de voie")
       changingLane lane_where_to_move
     ]
     [
@@ -509,30 +509,37 @@ to move
     ;;;;;;;;;;;;;;;;;;
     ;Récupère le numéro de l'intersection actuelle
     set num_intersection getNumIntersection pxcor pycor
-    print(word "num_intersection: " num_intersection)
-    ;;;;;;;;;;;;;;;;;;
-
     set direction next_direction_
+    print(word "intersections: " num_intersection " " num_intersection_)
+    if num_intersection != num_intersection_[
+      findNextDirection
+      set num_intersection_ num_intersection
+    ]
     setHeadingAndShapeAccordingCarDirection
     forward speed
 
     ;;Regarde si on peut modifier la prochaine direction
     ;resetDirection
+    ;;;;;;;;;;;;;;;;;;
   ]
 end
 
 to findNextDirection
   if direction = "N" [
-    set next_direction_ one-of["N" "E" "O"]
+    set next_direction_ one-of["N" "E"]
+    ;set next_direction_ one-of["N" "E" "O"]
   ]
   if direction = "E" [
-    set next_direction_ one-of["E" "S" "N"]
+    set next_direction_ one-of["E" "S"]
+    ;set next_direction_ one-of["E" "S" "N"]
   ]
   if direction = "S" [
-    set next_direction_ one-of["S" "O" "E"]
+    set next_direction_ one-of["S" "O"]
+    ;set next_direction_ one-of["S" "O" "E"]
   ]
   if direction = "O" [
-    set next_direction_ one-of["O" "N" "S"]
+    set next_direction_ one-of["O" "N"]
+    ;set next_direction_ one-of["O" "N" "S"]
   ]
 end
 
@@ -544,7 +551,7 @@ to resetDirection
       ]
     ]
     if is_intersection?[
-      print(word "direction: " direction " next direction: " next_direction_)
+      ;print(word "direction: " direction " next direction: " next_direction_)
       findNextDirection
     ]
 end
@@ -567,24 +574,33 @@ to-report getNumIntersection [car-posx car-posy]
 end
 
 ;;Fonction qui permet si besoin quelle est la voie sur laquelle doit se déplacer la voiture(0 si aucun déplacement, sinon > 0)
+;;Cette fonction suppose que la voiture ne se trouve pas dans une intersection
 to-report checkNeedChangingLane
   let next_direction ""
   let lane getLane
   let lane_where_to_move 0
 
+  ;print(word "checkNeedChangingLane - LANE="lane)
+
   if direction = "N" [
     if next_direction_ = "E" and lane != 1[
-
+      set lane_where_to_move 1
     ]
   ]
   if direction = "E" [
-    set next_direction_ one-of["E" "S" "N"]
+    if next_direction_ = "S" and lane != 1[
+      set lane_where_to_move 1
+    ]
   ]
   if direction = "S" [
-    set next_direction_ one-of["S" "O" "E"]
+    if next_direction_ = "O" and lane != 1[
+      set lane_where_to_move 1
+    ]
   ]
   if direction = "O" [
-    set next_direction_ one-of["O" "N" "S"]
+    if next_direction_ = "N" and lane != 1[
+      set lane_where_to_move 1
+    ]
   ]
 
 
@@ -592,7 +608,17 @@ to-report checkNeedChangingLane
 end
 ;;Fonction qui permet de deplacer la voiture vers la voie numéro lane
 to changingLane [lane]
-  print(word "Vers voie " lane)
+  let bad_lane getLane
+  ;print(word "Vers voie " lane)
+
+  ifelse bad_lane > lane[
+    set heading (heading + 90)
+    fd 1
+    set heading (heading - 90)
+  ]
+  [
+
+  ]
 end
 
 to-report getLane

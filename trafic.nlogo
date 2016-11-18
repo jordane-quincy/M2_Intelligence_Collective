@@ -618,7 +618,7 @@ to move
   let is_intersection? false
   let new_direction direction
   let num_intersection 0
-  let can_turn? false
+  let can_turn? true
   let can_change_lane? false
   let lane_where_to_move 0
 
@@ -632,18 +632,18 @@ to move
       set wait-time 0
     ]
   ]
+
   ask patch-here[
     if intersection?[
       set is_intersection? true
     ]
   ]
-
   ifelse not is_intersection? or not can_turn?[
     ifelse can_change_lane?[
       set lane_where_to_move checkNeedChangingLane
       ifelse lane_where_to_move > 0[
         ;print(word "Changement de voie")
-        changingLane lane_where_to_move
+        ;changingLane lane_where_to_move
       ]
       [
         forward speed
@@ -656,18 +656,18 @@ to move
   [
     ;;;;;;;;;;;;;;;;;;
     ;Récupère le numéro de l'intersection actuelle
-    ;print(word "intersections 1: " num_intersection " " num_intersection_)
     set num_intersection getNumIntersection pxcor pycor
 
     ;Donne la prochaine direction pour la prochaine intersection
-    set direction next_direction_
-    ;if num_intersection
-    ;print(word "intersections 2: " num_intersection " " num_intersection_)
-    setHeadingAndShapeAccordingCarDirection
-    forward speed
+    ;
+    ;setHeadingAndShapeAccordingCarDirection
 
-    ;;Regarde si on peut modifier la prochaine direction
-    ;resetDirection
+    if num_intersection != num_intersection_[
+      findNextDirection
+      set num_intersection_ num_intersection
+      set direction next_direction_
+    ]
+    forward speed
     ;;;;;;;;;;;;;;;;;;
   ]
 end
@@ -691,10 +691,6 @@ to findNextDirection
   ]
 end
 
-to resetDirection
-
-end
-
 ;Retourne le numero de l'intersection ou se trouve la voiture
 to-report getNumIntersection [car-posx car-posy]
   let num 0
@@ -706,8 +702,6 @@ to-report getNumIntersection [car-posx car-posy]
   ask banners-on intersections with [(pxcor >= xMin and pxcor <= xMax) and (pycor >= yMin and pycor <= yMax)] [
      set num label
   ]
-
-  print(word "LABEL: "num)
   report num
 end
 
@@ -832,7 +826,7 @@ CHOOSER
 road_size
 road_size
 1 2 3
-1
+2
 
 BUTTON
 18

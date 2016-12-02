@@ -214,7 +214,7 @@ to setup-cars
       set patchDirection dir
     ]
     set direction patchDirection
-    findNextDirection
+    set next_direction_ findNextDirection
     set num_intersection_ 0
 
     setHeadingAndShapeAccordingCarDirection
@@ -617,7 +617,6 @@ end
 to move
   let is_intersection? false
   let new_direction direction
-  let num_intersection 0
   let can_turn? true
   let can_change_lane? false
   let lane_where_to_move 0
@@ -655,40 +654,99 @@ to move
   ]
   [
     ;;;;;;;;;;;;;;;;;;
-    ;Récupère le numéro de l'intersection actuelle
-    set num_intersection getNumIntersection pxcor pycor
-
-    ;Donne la prochaine direction pour la prochaine intersection
-    ;
-    ;setHeadingAndShapeAccordingCarDirection
-
-    if num_intersection != num_intersection_[
-      findNextDirection
-      set num_intersection_ num_intersection
-      set direction next_direction_
-    ]
-    forward speed
+    moveInIntersection
     ;;;;;;;;;;;;;;;;;;
   ]
 end
 
-to findNextDirection
+;Permet en fonction de la prochaine direction à prendre tourner de suite(à droite), continuer tout droit, ou avancer apres le flage avant de tourner.
+to moveInIntersection
+  let num_intersection 0
+  ;Récupère le numéro de l'intersection actuelle
+  set num_intersection getNumIntersection pxcor pycor
+
+  ;On regarde si on est pas déjà passé juste avant sur un patch de cette intersection.
+  if num_intersection != num_intersection_ or getNextDirection = "left"[
+    if num_intersection != num_intersection_[
+      ;Donne la prochaine direction pour la prochaine intersection.
+      set next_direction_ findNextDirection
+      set num_intersection_ num_intersection
+    ]
+
+    if getNextDirection = "right" [
+        set direction next_direction_
+    ]
+
+  ]
+
+  forward speed
+end
+
+to-report findNextDirection
+  let next_direction ""
+
   if direction = "N" [
-    set next_direction_ one-of["N" "E"]
-    ;set next_direction_ one-of["N" "E" "O"]
+    set next_direction one-of["N" "E" "O"]
   ]
   if direction = "E" [
-    set next_direction_ one-of["E" "S"]
-    ;set next_direction_ one-of["E" "S" "N"]
+    set next_direction one-of["E" "S" "N"]
   ]
   if direction = "S" [
-    set next_direction_ one-of["S" "O"]
-    ;set next_direction_ one-of["S" "O" "E"]
+    set next_direction one-of["S" "O" "E"]
   ]
   if direction = "O" [
-    set next_direction_ one-of["O" "N"]
-    ;set next_direction_ one-of["O" "N" "S"]
+    set next_direction one-of["O" "N" "S"]
   ]
+  report next_direction
+end
+
+to-report getNextDirection
+
+  if direction = "N" [
+      if next_direction_ = "N"[
+        report "ahead"
+      ]
+      if next_direction_ = "O"[
+        report "left"
+      ]
+      if next_direction_ = "E"[
+        report "right"
+      ]
+    ]
+    if direction = "E" [
+      if next_direction_ = "E"[
+        report "ahead"
+      ]
+      if next_direction_ = "N"[
+        report "left"
+      ]
+      if next_direction_ = "S"[
+        report "right"
+      ]
+    ]
+    if direction = "S" [
+      if next_direction_ = "S"[
+        report "ahead"
+      ]
+      if next_direction_ = "E"[
+        report "left"
+      ]
+      if next_direction_ = "O"[
+        report "right"
+      ]
+    ]
+    if direction = "O" [
+      if next_direction_ = "O"[
+        report "ahead"
+      ]
+      if next_direction_ = "S"[
+        report "left"
+      ]
+      if next_direction_ = "N"[
+        report "right"
+      ]
+    ]
+    report "unknown"
 end
 
 ;Retourne le numero de l'intersection ou se trouve la voiture
@@ -734,7 +792,6 @@ to-report checkNeedChangingLane
       set lane_where_to_move 1
     ]
   ]
-
 
   report lane_where_to_move
 end
@@ -871,7 +928,7 @@ num-cars
 num-cars
 0
 400
-380
+1
 1
 1
 NIL

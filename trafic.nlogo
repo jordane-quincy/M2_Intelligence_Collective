@@ -26,16 +26,19 @@ patches-own[
 ]
 
 cars-own[
-  speed              ;; Vitesse courante
-  speed-max          ;; Vitesse desiree de l’agent
-  patience           ;; Niveau de patience (dans un stop ou pour depasser un autre agent)
-  cptAvancement      ;; Permet de compter le nbr de fois qu'on avance sans s'arrêter
-  change?            ;; Vraie si le vehicule veut changer de voies
-  direction          ;; La direction desiree courante (nord, sud, est, ouest)
-  next_direction_    ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
-  num_intersection_  ;; Permet de savoir si on peut set la prochaine direction
-  wait-time          ;; Le temps passé depuis son dernier deplacement
-  isInitialising?    ;; La voiture est en train d'être initialisé (true tant que la voiture n'est pas toute seule sur un patch, false sinon)
+  speed                    ;; Vitesse courante
+  speed-max                ;; Vitesse desiree de l’agent
+  patience                 ;; Niveau de patience (dans un stop ou pour depasser un autre agent)
+  cptAvancement            ;; Permet de compter le nbr de fois qu'on avance sans s'arrêter
+  change?                  ;; Vraie si le vehicule veut changer de voies
+  direction                ;; La direction desiree courante (nord, sud, est, ouest)
+  next_direction_          ;; La direction qu'il va prendre lors de l'arrivée sur le carrefour
+  num_intersection_        ;; Permet de savoir si on peut set la prochaine direction
+  wait-time                ;; Le temps passé depuis son dernier deplacement
+  isInitialising?          ;; La voiture est en train d'être initialisé (true tant que la voiture n'est pas toute seule sur un patch, false sinon)
+  nb_patch_before_flag_    ;; Se décremente jusqu'à avoir atteind, dans l'intersection, le patch délimité par le drapeau et à partir duquel on commence à décrementer nb_patch_before_flag_
+  nb_patch_before_turning_ ;; Se décremente jusqu'à avoir atteind, dans l'intersection, le patch à partir duquel on peut tourner(Init = road_size)
+  turned?                  ;; Permet de savoir s'il on à tourner
 ]
 banners-own[
   frequenceRedGreen ;Nombre de ticks avant passage du rouge au vert et du vert au orange.
@@ -216,6 +219,9 @@ to setup-cars
     set direction patchDirection
     set next_direction_ findNextDirection
     set num_intersection_ 0
+    set nb_patch_before_flag_ road_size
+    set nb_patch_before_turning_ (road_size - getLane)
+    set turned? false
 
     setHeadingAndShapeAccordingCarDirection
 
@@ -643,6 +649,7 @@ to move
       ifelse lane_where_to_move > 0[
         ;print(word "Changement de voie")
         ;changingLane lane_where_to_move
+        ;Ne pas oublier apres le changement de lane de réinitialiser la valeur de nb_patch_before_turning_ qui dépend en partie de la lane sur laquelle se trouve la voiture !
       ]
       [
         forward speed
@@ -668,15 +675,38 @@ to moveInIntersection
   ;On regarde si on est pas déjà passé juste avant sur un patch de cette intersection.
   if num_intersection != num_intersection_ or getNextDirection = "left"[
     if num_intersection != num_intersection_[
-      ;Donne la prochaine direction pour la prochaine intersection.
+      set turned? false
+    ]
+    print(word "NextDirection: " getNextDirection)
+    ifelse getNextDirection = "right" or getNextDirection = "ahead" [
+      print(word "TOURNER 1" getNextDirection)
       set next_direction_ findNextDirection
       set num_intersection_ num_intersection
+      set direction next_direction_
     ]
+    [
+      print(word "TOURNER 2" getNextDirection)
+      if not turned?[
+        ifelse nb_patch_before_flag_ = 0[
+          ifelse nb_patch_before_turning_ = 0[
+            set direction next_direction_
+            set next_direction_ findNextDirection
+            set num_intersection_ num_intersection
 
-    if getNextDirection = "right" [
-        set direction next_direction_
+            set nb_patch_before_flag_ road_size
+            set nb_patch_before_turning_ (road_size - getLane)
+
+            set turned? true
+          ]
+          [
+            set nb_patch_before_turning_ (nb_patch_before_turning_ - 1)
+          ]
+        ]
+        [
+          set nb_patch_before_flag_ (nb_patch_before_flag_ - 1)
+        ]
+      ]
     ]
-
   ]
 
   forward speed
@@ -700,6 +730,7 @@ to-report findNextDirection
   report next_direction
 end
 
+;Renvoie quelle dans quelle direction va prendre l'agent en penetrant dans l'intersection
 to-report getNextDirection
 
   if direction = "N" [

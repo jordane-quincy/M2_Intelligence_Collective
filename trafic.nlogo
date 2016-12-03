@@ -219,8 +219,8 @@ to setup-cars
     set direction patchDirection
     set next_direction_ findNextDirection
     set num_intersection_ 0
-    set nb_patch_before_flag_ road_size
-    set nb_patch_before_turning_ (road_size - getLane)
+    set nb_patch_before_flag_ road_size * 2
+    set nb_patch_before_turning_ (road_size - getLane) * 2
     set turned? false
 
     setHeadingAndShapeAccordingCarDirection
@@ -673,28 +673,31 @@ to moveInIntersection
   set num_intersection getNumIntersection pxcor pycor
 
   ;On regarde si on est pas déjà passé juste avant sur un patch de cette intersection.
-  if num_intersection != num_intersection_ or getNextDirection = "left"[
+print(word "DIRECTION: " direction " PROCHAINE:" next_direction_)
+  if num_intersection != num_intersection_ or (getNextDirection = "left" and turned? = false) [
+print(word "INTERSECTION 1")
     if num_intersection != num_intersection_[
       set turned? false
     ]
-    print(word "NextDirection: " getNextDirection)
-    ifelse getNextDirection = "right" or getNextDirection = "ahead" [
-      print(word "TOURNER 1" getNextDirection)
+;print(word "NextDirection: " getNextDirection)
+    ifelse getNextDirection = "right" or getNextDirection = "ahead"[
+;print(word "TOURNER 1" getNextDirection)
+      set direction next_direction_
       set next_direction_ findNextDirection
       set num_intersection_ num_intersection
-      set direction next_direction_
     ]
     [
-      print(word "TOURNER 2" getNextDirection)
+print(word "INTERSECTION 2 " getNextDirection)
       if not turned?[
         ifelse nb_patch_before_flag_ = 0[
           ifelse nb_patch_before_turning_ = 0[
+print(word "TURNING")
             set direction next_direction_
             set next_direction_ findNextDirection
             set num_intersection_ num_intersection
 
-            set nb_patch_before_flag_ road_size
-            set nb_patch_before_turning_ (road_size - getLane)
+            set nb_patch_before_flag_ road_size * 2
+            set nb_patch_before_turning_ (road_size - getLane) * 2
 
             set turned? true
           ]
@@ -714,7 +717,7 @@ end
 
 to-report findNextDirection
   let next_direction ""
-
+print(word "findNextDirection")
   if direction = "N" [
     set next_direction one-of["N" "E" "O"]
   ]
@@ -732,48 +735,60 @@ end
 
 ;Renvoie quelle dans quelle direction va prendre l'agent en penetrant dans l'intersection
 to-report getNextDirection
-
+print(word "getNextDirection")
   if direction = "N" [
       if next_direction_ = "N"[
+;print(word "N ahead " next_direction_)
         report "ahead"
       ]
       if next_direction_ = "O"[
+;print(word "O left " next_direction_)
         report "left"
       ]
       if next_direction_ = "E"[
+;print(word "E right " next_direction_)
         report "right"
       ]
     ]
     if direction = "E" [
       if next_direction_ = "E"[
+;print(word "E ahead " next_direction_)
         report "ahead"
       ]
       if next_direction_ = "N"[
+;print(word "E left " next_direction_)
         report "left"
       ]
       if next_direction_ = "S"[
+;print(word "E right " next_direction_)
         report "right"
       ]
     ]
     if direction = "S" [
       if next_direction_ = "S"[
+;print(word "S ahead " next_direction_)
         report "ahead"
       ]
       if next_direction_ = "E"[
+;print(word "S left " next_direction_)
         report "left"
       ]
       if next_direction_ = "O"[
+;print(word "S right " next_direction_)
         report "right"
       ]
     ]
     if direction = "O" [
       if next_direction_ = "O"[
+;print(word "O ahead " next_direction_)
         report "ahead"
       ]
       if next_direction_ = "S"[
+;print(word "O left " next_direction_)
         report "left"
       ]
       if next_direction_ = "N"[
+;print(word "O right " next_direction_)
         report "right"
       ]
     ]

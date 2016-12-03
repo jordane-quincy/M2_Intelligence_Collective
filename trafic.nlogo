@@ -219,8 +219,8 @@ to setup-cars
     set direction patchDirection
     set next_direction_ findNextDirection
     set num_intersection_ 0
-    set nb_patch_before_flag_ road_size * 2
-    set nb_patch_before_turning_ (road_size - getLane) * 2
+    set nb_patch_before_flag_ road_size
+    set nb_patch_before_turning_ (road_size - getLane)
     set turned? false
 
     setHeadingAndShapeAccordingCarDirection
@@ -687,8 +687,8 @@ print(word "INTERSECTION 1")
       set num_intersection_ num_intersection
     ]
     [
-print(word "INTERSECTION 2 " getNextDirection)
-      if not turned?[
+print(word "INTERSECTION 2 ")
+      if not turned?[print(word "INTERSECTION 2.1 " getNextDirection " - speed: " speed)
         ifelse nb_patch_before_flag_ = 0[
           ifelse nb_patch_before_turning_ = 0[
 print(word "TURNING")
@@ -696,17 +696,17 @@ print(word "TURNING")
             set next_direction_ findNextDirection
             set num_intersection_ num_intersection
 
-            set nb_patch_before_flag_ road_size * 2
-            set nb_patch_before_turning_ (road_size - getLane) * 2
+            set nb_patch_before_flag_ road_size
+            set nb_patch_before_turning_ (road_size - getLane)
 
             set turned? true
           ]
           [
-            set nb_patch_before_turning_ (nb_patch_before_turning_ - 1)
+            set nb_patch_before_turning_ (nb_patch_before_turning_ - speed)
           ]
         ]
         [
-          set nb_patch_before_flag_ (nb_patch_before_flag_ - 1)
+          set nb_patch_before_flag_ (nb_patch_before_flag_ - speed)
         ]
       ]
     ]

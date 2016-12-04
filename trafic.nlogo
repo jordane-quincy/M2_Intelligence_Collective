@@ -939,7 +939,7 @@ CHOOSER
 road_size
 road_size
 1 2 3
-1
+2
 
 BUTTON
 18

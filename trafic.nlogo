@@ -36,9 +36,8 @@ cars-own[
   num_intersection_        ;; Permet de savoir si on peut set la prochaine direction
   wait-time                ;; Le temps passé depuis son dernier deplacement
   isInitialising?          ;; La voiture est en train d'être initialisé (true tant que la voiture n'est pas toute seule sur un patch, false sinon)
-  nb_patch_before_flag_    ;; Se décremente jusqu'à avoir atteind, dans l'intersection, le patch délimité par le drapeau et à partir duquel on commence à décrementer nb_patch_before_flag_
-  nb_patch_before_turning_ ;; Se décremente jusqu'à avoir atteind, dans l'intersection, le patch à partir duquel on peut tourner(Init = road_size)
   turned?                  ;; Permet de savoir s'il on à tourner
+  lane_                    ;; Numero de la voie sur laquelle se trouve la voiture avant l'intersection
 ]
 banners-own[
   frequenceRedGreen ;Nombre de ticks avant passage du rouge au vert et du vert au orange.
@@ -219,9 +218,10 @@ to setup-cars
     set direction patchDirection
     set next_direction_ findNextDirection
     set num_intersection_ 0
-    set nb_patch_before_flag_ road_size
-    set nb_patch_before_turning_ (road_size - getLane)
+    ;set nb_patch_before_flag_ road_size
+    ;set nb_patch_before_turning_ (road_size - getLane)
     set turned? false
+    set lane_ getLane
 
     setHeadingAndShapeAccordingCarDirection
 
@@ -671,12 +671,14 @@ to moveInIntersection
   let num_intersection 0
   ;Récupère le numéro de l'intersection actuelle
   set num_intersection getNumIntersection pxcor pycor
+  let in_intersection? false
 
   ;On regarde si on est pas déjà passé juste avant sur un patch de cette intersection.
-print(word "DIRECTION: " direction " PROCHAINE:" next_direction_)
+;print(word "DIRECTION: " direction " PROCHAINE:" next_direction_)
   if num_intersection != num_intersection_ or (getNextDirection = "left" and turned? = false) [
-print(word "INTERSECTION 1")
+;print(word "INTERSECTION 1")
     if num_intersection != num_intersection_[
+
       set turned? false
     ]
 ;print(word "NextDirection: " getNextDirection)
@@ -685,28 +687,36 @@ print(word "INTERSECTION 1")
       set direction next_direction_
       set next_direction_ findNextDirection
       set num_intersection_ num_intersection
+      set turned? true
     ]
     [
-print(word "INTERSECTION 2 ")
-      if not turned?[print(word "INTERSECTION 2.1 " getNextDirection " - speed: " speed)
-        ifelse nb_patch_before_flag_ = 0[
-          ifelse nb_patch_before_turning_ = 0[
-print(word "TURNING")
+;print(word "INTERSECTION 2 ")
+      if not turned?[
+;print(word "INTERSECTION 2.1 " getNextDirection " - speed: " speed)
+        ;ask patch-ahead 1[
+        ;  let x pxcor
+        ;  let y pycor
+        ;]
+        let d ((road_size - lane_ + 1) + speed)
+        ;if d >= 3[
+        ;  set d (3 + speed)
+        ;]
+        let p patch-ahead d
+;print(word "TURNING")
+        ask intersections[
+          if self = p[
+            print(word "MATCH")
+            set in_intersection? true
+          ]
+        ]
+        if in_intersection? = false[
             set direction next_direction_
             set next_direction_ findNextDirection
             set num_intersection_ num_intersection
 
-            set nb_patch_before_flag_ road_size
-            set nb_patch_before_turning_ (road_size - getLane)
+            ;set nb_patch_before_turning_ getLane
 
             set turned? true
-          ]
-          [
-            set nb_patch_before_turning_ (nb_patch_before_turning_ - speed)
-          ]
-        ]
-        [
-          set nb_patch_before_flag_ (nb_patch_before_flag_ - speed)
         ]
       ]
     ]
@@ -929,7 +939,7 @@ CHOOSER
 road_size
 road_size
 1 2 3
-2
+1
 
 BUTTON
 18
@@ -974,7 +984,7 @@ num-cars
 num-cars
 0
 400
-1
+71
 1
 1
 NIL

@@ -274,7 +274,7 @@ end
 ;crossroads_num: Numero du carrefour(label du flag)
 ;frequence: entre 1 et l'infini !
 to set-frequence [crossroads_num frequence]
-  if frequence > 0 and frequence < 500[
+  if frequence >= 0 and frequence < 500[
     ask banners[
       if label = crossroads_num[
         set frequenceRedGreen frequence
@@ -305,82 +305,96 @@ end
 ;Gestion des feux
 to change-lights
   let i 0
-  let time_before_green 0 ;Pour passer au rouge ou vert selon le feu
-  let time_before_red 0   ;Pour passer au rouge apres orange
   let nb_ticks ticks
 
   while[i < road_size][
     ask banners[
         ;print(word "ticks: " ticks " time * frequenceRedGreen: " frequenceRedGreen)
-      if ticks - time = frequenceRedGreen or ticks - time = (frequenceRedGreen + frequenceOrange)[
-        if ticks - time = frequenceRedGreen[
-          ask patch-at road_size i[
-            if pcolor = green[
-              set pcolor orange
+        ifelse frequenceRedGreen > 0[
+          if ticks - time = frequenceRedGreen or ticks - time = (frequenceRedGreen + frequenceOrange)[
+            if ticks - time = frequenceRedGreen[
+              ask patch-at road_size i[
+                if pcolor = green[
+                  set pcolor orange
+                ]
+              ]
+              ask patch-at (- road_size - 1) (- road_size + i)[
+                if pcolor = green[
+                  set pcolor orange
+                ]
+              ]
+              ask patch-at (- road_size + i) road_size[
+                if pcolor = green[
+                  set pcolor orange
+                ]
+              ]
+              ask patch-at (i) (- road_size - 1)[
+                if pcolor = green[
+                  set pcolor orange
+                ]
+              ]
             ]
-          ]
-          ask patch-at (- road_size - 1) (- road_size + i)[
-            if pcolor = green[
-              set pcolor orange
+            if ticks - time = (frequenceRedGreen + frequenceOrange)[
+              ask patch-at road_size i[
+                if pcolor = red[
+                  set pcolor green
+                ]
+              ]
+              ask patch-at (- road_size - 1) (- road_size + i)[
+                if pcolor = red[
+                  set pcolor green
+                ]
+              ]
+              ask patch-at (- road_size + i) road_size[
+                if pcolor = red[
+                  set pcolor green
+                ]
+              ]
+              ask patch-at (i) (- road_size - 1)[
+                if pcolor = red[
+                  set pcolor green
+                ]
+              ]
             ]
-          ]
-          ask patch-at (- road_size + i) road_size[
-            if pcolor = green[
-              set pcolor orange
-            ]
-          ]
-          ask patch-at (i) (- road_size - 1)[
-            if pcolor = green[
-              set pcolor orange
+            if ticks - time = (frequenceRedGreen + frequenceOrange)[
+              if i = (road_size - 1)[set time (time + frequenceRedGreen)]
+              ask patch-at road_size i[
+                if pcolor = orange[
+                  set pcolor red
+                ]
+              ]
+              ask patch-at (- road_size - 1) (- road_size + i)[
+                if pcolor = orange[
+                  set pcolor red
+                ]
+              ]
+              ask patch-at (- road_size + i) road_size[
+                if pcolor = orange[
+                  set pcolor red
+                ]
+              ]
+              ask patch-at (i) (- road_size - 1)[
+                if pcolor = orange[
+                  set pcolor red
+                ]
+              ]
             ]
           ]
         ]
-        if ticks - time = (frequenceRedGreen + frequenceOrange)[
+        [
           ask patch-at road_size i[
-            if pcolor = red[
-              set pcolor green
-            ]
-          ]
+            set pcolor orange
+              ]
           ask patch-at (- road_size - 1) (- road_size + i)[
-            if pcolor = red[
-              set pcolor green
-            ]
+            set pcolor orange
           ]
           ask patch-at (- road_size + i) road_size[
-            if pcolor = red[
-              set pcolor green
-            ]
+            set pcolor orange
           ]
           ask patch-at (i) (- road_size - 1)[
-            if pcolor = red[
-              set pcolor green
-            ]
+            set pcolor orange
           ]
         ]
-        if ticks - time = (frequenceRedGreen + frequenceOrange)[
-          if i = (road_size - 1)[set time (time + frequenceRedGreen)]
-          ask patch-at road_size i[
-            if pcolor = orange[
-              set pcolor red
-            ]
-          ]
-          ask patch-at (- road_size - 1) (- road_size + i)[
-            if pcolor = orange[
-              set pcolor red
-            ]
-          ]
-          ask patch-at (- road_size + i) road_size[
-            if pcolor = orange[
-              set pcolor red
-            ]
-          ]
-          ask patch-at (i) (- road_size - 1)[
-            if pcolor = orange[
-              set pcolor red
-            ]
-          ]
-        ]
-      ]
     ]
     set i (i + 1)
   ]
@@ -729,16 +743,96 @@ to-report findNextDirection
   let next_direction ""
 print(word "findNextDirection")
   if direction = "N" [
-    set next_direction one-of["N" "E" "O"]
+    if allowed_movement = "all"[
+      set next_direction one-of["N" "E" "O"]
+    ]
+    if allowed_movement = "avant"[
+      set next_direction one-of["N"]
+    ]
+    if allowed_movement = "gauche"[
+      set next_direction one-of["O"]
+    ]
+    if allowed_movement = "droite"[
+      set next_direction one-of["E"]
+    ]
+    if allowed_movement = "gauche et avant"[
+      set next_direction one-of["N" "O"]
+    ]
+    if allowed_movement = "droite et avant"[
+      set next_direction one-of["N" "E"]
+    ]
+    if allowed_movement = "gauche et droite"[
+      set next_direction one-of["E" "O"]
+    ]
   ]
   if direction = "E" [
-    set next_direction one-of["E" "S" "N"]
+    if allowed_movement = "all"[
+      set next_direction one-of["E" "S" "N"]
+    ]
+    if allowed_movement = "avant"[
+      set next_direction one-of["E"]
+    ]
+    if allowed_movement = "gauche"[
+      set next_direction one-of["N"]
+    ]
+    if allowed_movement = "droite"[
+      set next_direction one-of["S"]
+    ]
+    if allowed_movement = "gauche et avant"[
+      set next_direction one-of["E" "N"]
+    ]
+    if allowed_movement = "droite et avant"[
+      set next_direction one-of["E" "S"]
+    ]
+    if allowed_movement = "gauche et droite"[
+      set next_direction one-of["S" "N"]
+    ]
   ]
   if direction = "S" [
-    set next_direction one-of["S" "O" "E"]
+    if allowed_movement = "all"[
+      set next_direction one-of["S" "O" "E"]
+    ]
+    if allowed_movement = "avant"[
+      set next_direction one-of["S"]
+    ]
+    if allowed_movement = "gauche"[
+      set next_direction one-of["E"]
+    ]
+    if allowed_movement = "droite"[
+      set next_direction one-of["O"]
+    ]
+    if allowed_movement = "gauche et avant"[
+      set next_direction one-of["S" "E"]
+    ]
+    if allowed_movement = "droite et avant"[
+      set next_direction one-of["S" "O"]
+    ]
+    if allowed_movement = "gauche et droite"[
+      set next_direction one-of["O" "E"]
+    ]
   ]
   if direction = "O" [
-    set next_direction one-of["O" "N" "S"]
+    if allowed_movement = "all"[
+      set next_direction one-of["O" "N" "S"]
+    ]
+    if allowed_movement = "avant"[
+      set next_direction one-of["O"]
+    ]
+    if allowed_movement = "gauche"[
+      set next_direction one-of["S"]
+    ]
+    if allowed_movement = "droite"[
+      set next_direction one-of["N"]
+    ]
+    if allowed_movement = "gauche et avant"[
+      set next_direction one-of["O" "S"]
+    ]
+    if allowed_movement = "droite et avant"[
+      set next_direction one-of["O" "N"]
+    ]
+    if allowed_movement = "gauche et droite"[
+      set next_direction one-of["N" "S"]
+    ]
   ]
   report next_direction
 end
@@ -1149,6 +1243,16 @@ nbrAccidents
 17
 1
 11
+
+CHOOSER
+29
+178
+169
+223
+allowed_movement
+allowed_movement
+"all" "avant" "gauche" "droite" "gauche et avant" "droite et avant" "gauche et droite"
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

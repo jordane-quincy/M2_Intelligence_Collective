@@ -929,7 +929,7 @@ CHOOSER
 grid_y
 grid_y
 0 1 2 3 4 5
-3
+2
 
 CHOOSER
 36

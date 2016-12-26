@@ -515,7 +515,7 @@ to go
             ]
          ]
          if canGoNextOrientationCar? and canGoNextOrientationDir? [
-           print (word "la turtle " who " a changé de direction (de " direction " à " getDirectionWithHeading (nextOrientation) ") parcequ'elle a attendu trop longtemps")
+           ;print (word "la turtle " who " a changé de direction (de " direction " à " getDirectionWithHeading (nextOrientation) ") parcequ'elle a attendu trop longtemps")
            set nbrCarChangeDirectionDueToPatience nbrCarChangeDirectionDueToPatience + 1
            set direction (getDirectionWithHeading (nextOrientation))
          ]
@@ -719,7 +719,7 @@ to moveInIntersection
 ;print(word "TURNING")
         ask intersections[
           if self = p[
-            print(word "MATCH")
+            ;print(word "MATCH")
             set in_intersection? true
           ]
         ]
@@ -741,7 +741,7 @@ end
 
 to-report findNextDirection
   let next_direction ""
-print(word "findNextDirection")
+;print(word "findNextDirection")
   if direction = "N" [
     if allowed_movement = "all"[
       set next_direction one-of["N" "E" "O"]
@@ -839,7 +839,7 @@ end
 
 ;Renvoie quelle dans quelle direction va prendre l'agent en penetrant dans l'intersection
 to-report getNextDirection
-print(word "getNextDirection")
+;print(word "getNextDirection")
   if direction = "N" [
       if next_direction_ = "N"[
 ;print(word "N ahead " next_direction_)
@@ -1013,7 +1013,7 @@ CHOOSER
 grid_x
 grid_x
 1 2 3 4 5
-1
+0
 
 CHOOSER
 108
@@ -1033,7 +1033,7 @@ CHOOSER
 road_size
 road_size
 1 2 3
-2
+1
 
 BUTTON
 18
@@ -1078,7 +1078,7 @@ num-cars
 num-cars
 0
 400
-71
+33
 1
 1
 NIL
@@ -1108,7 +1108,7 @@ acceleration
 acceleration
 0
 0.099
-0.0845
+0.0612
 0.0001
 1
 NIL
@@ -1123,7 +1123,7 @@ deceleration
 deceleration
 0
 0.8
-0.311
+0.8
 0.001
 1
 NIL
@@ -1138,7 +1138,7 @@ ahead-vision
 ahead-vision
 0
 3
-2
+3
 1
 1
 NIL
@@ -1155,9 +1155,9 @@ crossroad-signal
 0
 
 PLOT
-878
+881
 10
-1331
+1334
 212
 Speeds
 time
@@ -1205,9 +1205,9 @@ NIL
 HORIZONTAL
 
 PLOT
-885
+888
 313
-1328
+1331
 513
 Voiture change direction
 time

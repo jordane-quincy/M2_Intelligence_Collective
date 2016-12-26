@@ -1013,7 +1013,7 @@ CHOOSER
 grid_x
 grid_x
 1 2 3 4 5
-0
+4
 
 CHOOSER
 108
@@ -1023,7 +1023,7 @@ CHOOSER
 grid_y
 grid_y
 0 1 2 3 4 5
-2
+5
 
 CHOOSER
 36
@@ -1205,10 +1205,10 @@ NIL
 HORIZONTAL
 
 PLOT
-888
-313
-1331
-513
+884
+283
+1335
+415
 Voiture change direction
 time
 nbrOfCar
@@ -1253,6 +1253,24 @@ allowed_movement
 allowed_movement
 "all" "avant" "gauche" "droite" "gauche et avant" "droite et avant" "gauche et droite"
 0
+
+PLOT
+885
+425
+1336
+565
+nombre d'accidents dans le temps
+time
+nbrAccidents
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot nbrAccidents"
 
 @#$#@#$#@
 ## WHAT IS IT?

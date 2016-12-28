@@ -28,7 +28,10 @@ end
 
 to go
   ; si plus aucun agents, on arrete
-  if not any? agents [ stop ]
+  if not any? agents [
+    print(word "Simulation terminée.")
+    stop
+  ]
   ; pour chaque agent
   ask agents with [numero = ticks ] [
     print(word "je suis l'agent " numero)
@@ -74,7 +77,7 @@ nbAgent
 nbAgent
 0
 100
-26
+30
 1
 1
 NIL
